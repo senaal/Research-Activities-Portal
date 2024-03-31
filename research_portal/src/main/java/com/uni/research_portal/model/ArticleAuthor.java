@@ -1,15 +1,21 @@
 package com.uni.research_portal.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "article_author")
 public class ArticleAuthor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "article_author_id")
-    private Long articleAuthorId;
+    private Integer articleAuthorId;
 
     @ManyToOne
     @JoinColumn(name = "article_id", referencedColumnName = "article_id")
@@ -17,6 +23,9 @@ public class ArticleAuthor {
 
     @Column
     private Integer authorId;
+
+    @Column
+    private Boolean isFacultyMember;
 
 }
 
