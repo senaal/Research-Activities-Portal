@@ -17,30 +17,30 @@ public class ScientificArticle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "article_id")
-    private Long articleId;
+    private Integer articleId;
 
     @Column(name = "paper_pdf")
     private String paperPdf;
 
-    @Column(name = "affiliation", nullable = false)
+    @Column(name = "affiliation")
     private String affiliation;
 
-    @Column(name = "doi", nullable = false)
+    @Column(name = "doi")
     private String doi;
 
-    @Column(name = "article_title", nullable = false)
+    @Column(name = "article_title")
     private String articleTitle;
 
-    @Column(name = "publication_date", nullable = false)
+    @Column(name = "publication_date")
     private java.sql.Timestamp publicationDate;
 
-    @Column(name = "citation_count", nullable = false)
+    @Column(name = "citation_count")
     private Integer citationCount;
 
-    @Column(name = "is_open_access", nullable = false)
+    @Column(name = "is_open_access")
     private boolean isOpenAccess;
 
-    @Column(name = "is_rejected", nullable = false)
+    @Column(name = "is_rejected")
     private boolean isRejected;
 
 }

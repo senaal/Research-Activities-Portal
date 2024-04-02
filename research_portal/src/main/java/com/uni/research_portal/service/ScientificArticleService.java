@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.sql.Timestamp;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,12 +50,14 @@ public class ScientificArticleService {
             try {
                 JsonNode jsonNode = objectMapper.readTree(responseBody);
                 if (jsonNode != null) {
-                    for (JsonNode resultNode : jsonNode.get("results")) {
+                    for (int i = 0; i< jsonNode.get("results").size();i++) {
+                        JsonNode resultNode = jsonNode.get("results").get(i);
                         String doi = resultNode.get("doi").asText().substring("https://doi.org/".length());
                         Optional<ScientificArticle> article = scientificArticleRepository.findByDoi(doi);
                         // adding new article
                         if (article.isEmpty()) {
                             ScientificArticle newArticle = new ScientificArticle();
+                            newArticle.setDoi(doi);
                             newArticle.setArticleTitle(resultNode.get("title").asText());
                             newArticle.setPublicationDate(Timestamp.valueOf(resultNode.get("publication_date").asText() + " 00:00:00"));
                             newArticle.setCitationCount(resultNode.get("cited_by_count").asInt());
@@ -78,8 +81,9 @@ public class ScientificArticleService {
                                         ExternalFacultyMember newExtMember = new ExternalFacultyMember();
                                         newExtMember.setOpenAlexId(openAlexId);
                                         newExtMember.setAuthorName(authorNode.get("author").get("display_name").asText());
-                                        newExtMember.setAffiliation(authorNode.get("institutions").get("display_name").asText());
+                                        newExtMember.setAffiliation(authorNode.get("institutions").get(0).get("display_name").asText());
                                         externalFacultyMemberRepository.save(newExtMember);
+                                        articleAuthor.setIsFacultyMember(false);
                                         articleAuthor.setAuthorId(newExtMember.getExternalAuthorId());
                                     }else{
                                         articleAuthor.setAuthorId(externalFacultyMember.getExternalAuthorId());
@@ -88,6 +92,7 @@ public class ScientificArticleService {
                                     articleAuthor.setIsFacultyMember(true);
                                     articleAuthor.setAuthorId(facultyMember.getAuthorId());
                                 }
+
                                 articleAuthorRepository.save(articleAuthor);
 
                             }
@@ -98,7 +103,7 @@ public class ScientificArticleService {
                         }
                     }
                 }
-            }catch (Exception ignored) {}
+            }catch (Exception e) {throw new Exception(e);}
             new ResponseEntity<>("Article Synchronization Completed.", HttpStatus.OK);
         }catch(Exception e){
             new ResponseEntity<>("Check the Request.", HttpStatus.BAD_REQUEST);
