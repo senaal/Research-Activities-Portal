@@ -15,7 +15,7 @@ public class FacultyMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "author_id")
-    private Long authorId;
+    private Integer authorId;
 
     @ManyToOne
     @JoinColumn(name = "departmentId", referencedColumnName = "departmentId")
@@ -45,7 +45,7 @@ public class FacultyMember {
     @Column
     private Integer hIndex;
 
-    @Column
+    @Column(name="i10_index")
     private Integer i10Index;
 
     @Column
