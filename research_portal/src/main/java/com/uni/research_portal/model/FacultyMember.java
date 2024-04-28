@@ -53,7 +53,7 @@ public class FacultyMember {
 
     @Column
     private boolean isDeleted;
-
+/*
     @ManyToMany(mappedBy = "facultyMembers")
-    private Set<ResearchArea> researchAreas;
+    private Set<ResearchArea> researchAreas;*/
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uni.research_portal.model.FacultyMember;
 import com.uni.research_portal.repository.FacultyMemberRepository;
+import com.uni.research_portal.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class FacultyMemberService {
     @Autowired
@@ -60,4 +63,16 @@ public class FacultyMemberService {
 
         }
     }
+
+    public FacultyMember getAuthorInfo(int authorId) {
+        Optional<FacultyMember> member = facultyMemberRepository.findByAuthorIdAndIsDeletedFalse(authorId);
+        if(member.isPresent()){
+            return member.get();
+        }
+        else{
+            throw new ResourceNotFoundException(String.format("Faculty member with id %s is not found", authorId));
+        }
+    }
+
 }
+
