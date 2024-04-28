@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -121,6 +122,20 @@ public class ScientificArticleService {
         }catch(Exception e){
             return new ResponseEntity<>("Check the Request.",HttpStatus.BAD_REQUEST);
 
+        }
+    }
+
+    public List<ScientificArticle> getAuthorArticles(int authorId) {
+        ArrayList<ScientificArticle> responseArticles = new ArrayList<>();
+        try{
+            List<ArticleAuthor> articleAuthors = articleAuthorRepository.findByAuthorId(authorId);
+            for (ArticleAuthor articleAuthor : articleAuthors) {
+                Optional<ScientificArticle> article = scientificArticleRepository.findByArticleIdAndIsRejectedFalse(articleAuthor.getScientificArticle().getArticleId());
+                article.ifPresent(responseArticles::add);
+            }
+            return responseArticles;
+        }catch(Exception e){
+            return responseArticles;
         }
     }
 }
