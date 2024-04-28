@@ -1,67 +1,76 @@
-import React from 'react';
-import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
+import React, { useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons'
 
-
-// Mock data
-const mockArticles = [
-  {
-    "articleId": 3428,
-    "paperPdf": null,
-    "affiliation": "Bogazici University",
-    "doi": "/10.1109/icc.2011.5962989\"",
-    "articleTitle": "Modulation Techniques for Communication via Diffusion in Nanonetworks",
-    "publicationDate": "2011-05-31T21:00:00.000+00:00",
-    "citationCount": 326,
-    "openAccess": false,
-    "rejected": false
-  },
-  {
-    "articleId": 3429,
-    "paperPdf": null,
-    "affiliation": "Bogazici University",
-    "doi": "/10.1109/lcomm.2014.2320917\"",
-    "articleTitle": "Three-Dimensional Channel Characteristics for Molecular Communications With an Absorbing Receiver",
-    "publicationDate": "2014-05-31T21:00:00.000+00:00",
-    "citationCount": 308,
-    "openAccess": false,
-    "rejected": false
-  },
-  // Add more mock articles here
-];
-
-const fetchArticles = async () => {
-  // Simulate async behavior by wrapping the mock data in a Promise
-  return Promise.resolve(mockArticles);
-};
+import './profile.css';
 
 const Profile = () => {
-  const { data: articles, isLoading, error } = useQuery('articles', fetchArticles);
+  const [author, setAuthor] = useState(null);
+  const [articles, setArticles] = useState([]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      const authorResponse = await fetch('http://localhost:8080/facultymember/4');
+      const authorData = await authorResponse.json();
+      setAuthor(authorData);
 
-  if (error) {
-    return <div>Error fetching data!</div>;
-  }
+      const articlesData = [
+        {
+          articleId: 1,
+          articleTitle: "Mock Article 1",
+          affiliation: "Mock University",
+          doi: "/mock/doi/1",
+          publicationDate: "2022-01-01T00:00:00.000Z",
+          citationCount: 10,
+          openAccess: true,
+          authors: ["Sanem Arslan", "Haluk Rahmi Topcuoglu", "Mahmut Taylan Kandemir", "Oguz Tosun"]
+        },
+        {
+          articleId: 2,
+          articleTitle: "Mock Article 2",
+          affiliation: "Mock University",
+          doi: "/mock/doi/2",
+          publicationDate: "2022-02-01T00:00:00.000Z",
+          citationCount: 20,
+          openAccess: false,
+          authors: ["Sanem Arslan", "Haluk Rahmi Topcuoglu", "Mahmut Taylan Kandemir", "Oguz Tosun"]
+        }
+        // Add more mock articles as needed
+      ];
+      setArticles(articlesData);
+    };
+
+    fetchData();
+  }, []);
 
   return (
-    <div className="research-portal">
-      <div className="articles-list">
-        <h1>Articles</h1>
-        {articles.map(article => (
-          <div key={article.articleId} className="article-item">
-            <h2>{article.articleTitle}</h2>
-            <p>Affiliation: {article.affiliation}</p>
-            <p>DOI: {article.doi}</p>
-            <p>Publication Date: {new Date(article.publicationDate).toLocaleDateString()}</p>
-            <p>Citation Count: {article.citationCount}</p>
-            <p>Open Access: {article.openAccess ? "Yes" : "No"}</p>
-          </div>
-        ))}
+    <div className="author">
+      <div className="main-content">
+        <h2>Publications</h2>
+        <ul>
+          {articles.map(article => (
+            <li key={article.articleId}>
+              <div>
+                <a href={article.doi} className="article-title">{article.articleTitle}</a>
+                <p className="author-info">Authors: {article.authors.join(', ')}</p>
+                <p className="publication-date">Publication Date: {new Date(article.publicationDate).toLocaleDateString()}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="contact-info">
+      <img src={'https://www.cmpe.boun.edu.tr/sites/default/files/featured/person/tuna_tugcu.jpg'} alt="Author's Photo" className="author-photo" />
+        <h1>{author && `${author.title} ${author.authorName}`}</h1>
+        <p>{author && author.departmentId.departmentName}</p>
+        <h2 style={{ marginTop: '30px' }}> {'Contact Info'}</h2>
+        <p><FontAwesomeIcon icon={faEnvelope} />  {author && author.email}</p>
+        <p><FontAwesomeIcon icon={faPhone} /> {author && author.phone} </p>
+        <p style={{ marginTop: '60px' }}> <img src={require("./index.PNG")}  className="icon" /> <strong>h-index:</strong> {author && author.hindex}</p>
+        <p><img src={require("./index.PNG")}  className="icon" /> <strong>Citation Count:</strong> {author && author.citedByCount}</p>
       </div>
     </div>
   );
-};
+};  
 
 export default Profile;
