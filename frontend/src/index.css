@@ -22,7 +22,7 @@ code {
 .uniname {
     color: white;
     font-family: 'Poppins';
-    font-weight:lighter;
+    font-weight: lighter;
     flex-grow: 1; 
     text-align: center;
 }
@@ -53,7 +53,6 @@ code {
     align-items: center;
     border-radius: 10px;
     height: 150%;
-
 }
 
 .nav-link:hover {

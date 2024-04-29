@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import logo from './photo.jpeg';
+import logo from './photos/photo.jpeg';
 
 function Navbar(){
     useEffect(() => {
