@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons'
 import { useParams } from 'react-router-dom'; // Import useParams from react-router-dom
-
 import './profile.css';
 
 const Profile = () => {
@@ -70,8 +69,8 @@ const Profile = () => {
         <h2 style={{ marginTop: '30px' }}> {'Contact Info'}</h2>
         <p><FontAwesomeIcon icon={faEnvelope} />  {author && author.email}</p>
         <p><FontAwesomeIcon icon={faPhone} /> {author && author.phone} </p>
-        <p style={{ marginTop: '60px' }}> <img src={require("./index.PNG")}  className="icon" /> <strong>h-index:</strong> {author && author.hindex}</p>
-        <p><img src={require("./index.PNG")}  className="icon" /> <strong>Citation Count:</strong> {author && author.citedByCount}</p>
+        <p style={{ marginTop: '60px' }}> <img src={require("./photos/index.PNG")}  className="icon" /> <strong>h-index:</strong> {author && author.hindex}</p>
+        <p><img src={require("./photos/index.PNG")}  className="icon" /> <strong>Citation Count:</strong> {author && author.citedByCount}</p>
       </div>
     </div>
   );

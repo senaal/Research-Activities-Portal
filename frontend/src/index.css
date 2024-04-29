@@ -22,7 +22,7 @@ code {
 .uniname {
     color: white;
     font-family: 'Poppins';
-    font-weight:lighter;
+    font-weight: lighter;
     flex-grow: 1; 
     text-align: center;
 }
@@ -52,7 +52,7 @@ code {
     justify-content: center;
     align-items: center;
     border-radius: 10px;
-    height: 35px;
+    height: 200%;
 
 }
 
