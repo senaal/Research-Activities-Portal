@@ -53,6 +53,9 @@ public class FacultyMember {
 
     @Column
     private boolean isDeleted;
+
+    @Column
+    private String photo;
 /*
     @ManyToMany(mappedBy = "facultyMembers")
     private Set<ResearchArea> researchAreas;*/
