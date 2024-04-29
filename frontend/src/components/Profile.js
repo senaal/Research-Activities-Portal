@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons'
-import { useParams } from 'react-router-dom'; // Import useParams from react-router-dom
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons';
+import { useParams } from 'react-router-dom';
 
 import './profile.css';
 
@@ -9,62 +9,46 @@ const Profile = () => {
   const [author, setAuthor] = useState(null);
   const [articles, setArticles] = useState([]);
   
-  const { id } = useParams(); // Get the id from URL params
-  
+  const { id } = useParams();
+
   useEffect(() => {
     const fetchData = async () => {
-      const authorResponse = await fetch(`http://localhost:8080/facultymember/${id}`); // Use the id from URL
-      const authorData = await authorResponse.json();
-      setAuthor(authorData);
+      try {
+        // Fetch author data
+        const authorResponse = await fetch(`http://localhost:8080/facultymember/${id}`);
+        const authorData = await authorResponse.json();
+        setAuthor(authorData);
 
-      // Mock articles data
-      const articlesData = [
-        {
-          articleId: 1,
-          articleTitle: "Mock Article 1",
-          affiliation: "Mock University",
-          doi: "/mock/doi/1",
-          publicationDate: "2022-01-01T00:00:00.000Z",
-          citationCount: 10,
-          openAccess: true,
-          authors: ["Sanem Arslan", "Haluk Rahmi Topcuoglu", "Mahmut Taylan Kandemir", "Oguz Tosun"]
-        },
-        {
-          articleId: 2,
-          articleTitle: "Mock Article 2",
-          affiliation: "Mock University",
-          doi: "/mock/doi/2",
-          publicationDate: "2022-02-01T00:00:00.000Z",
-          citationCount: 20,
-          openAccess: false,
-          authors: ["Sanem Arslan", "Haluk Rahmi Topcuoglu", "Mahmut Taylan Kandemir", "Oguz Tosun"]
-        }
-        // Add more mock articles as needed
-      ];
-      setArticles(articlesData);
+        // Fetch articles data for the author
+        const articlesResponse = await fetch(`http://localhost:8080/article/author/${id}`);
+        const articlesData = await articlesResponse.json();
+        setArticles(articlesData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
 
     fetchData();
-  }, [id]); // Make sure to include id in dependency array
+  }, [id]);
 
   return (
     <div className="author">
       <div className="main-content">
-        <h2>Publications</h2>
+        <h2>Scientific Articles</h2>
         <ul>
           {articles.map(article => (
-            <li key={article.articleId}>
+            <li key={article.article.articleId}>
               <div>
-                <a href={article.doi} className="article-title">{article.articleTitle}</a>
-                <p className="author-info">Authors: {article.authors.join(', ')}</p>
-                <p className="publication-date">Publication Date: {new Date(article.publicationDate).toLocaleDateString()}</p>
+                <a style={{ marginTop: '20px' }} href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
+                <p className="author-info"> {article.authorNames.join(', ')}</p>
+                <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
               </div>
             </li>
           ))}
         </ul>
       </div>
       <div className="contact-info">
-      <img src={author && `${author.photo}`} alt="Author's Photo" className="author-photo" />
+        <img src={author && `${author.photo}`} alt="Author's Photo" className="author-photo" />
         <h1>{author && `${author.title} ${author.authorName}`}</h1>
         <p>{author && author.departmentId.departmentName}</p>
         <h2 style={{ marginTop: '30px' }}> {'Contact Info'}</h2>

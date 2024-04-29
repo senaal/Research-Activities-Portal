@@ -44,7 +44,7 @@
   }
 
   .article-title {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
   }
   
@@ -61,34 +61,55 @@
   .contact-info {
     width: 20%; /* Adjust the width as needed */
     text-align: center; /* Align the content to the right */
+    border: 2px solid #000000;
+    border-radius: 15px;
+    margin: 15px;
+    height: 15%;
   }
 
   .contact-info h1{
-    margin: 40px;
-    font-size: 45px;
+    margin: 10%;
+    font-size: 20px;
   }
 
   .contact-info h2{
-    margin: 20px;
-    font-size: 30px;
+    margin: 10px;
+    font-size: 15px;
     color:#4c4e50;
   }
 
 
   .contact-info p{
-    font-size: 30px;
+    font-size: 15px;
   }
 
   .icon {
-    width: 30px; /* Set the width of the icon */
+    width: 20px; /* Set the width of the icon */
     height: auto; /* Let the height adjust automatically to maintain aspect ratio */
     vertical-align: middle; /* Align the icon vertically in the middle */
   }
 
   .author-photo {
     margin: 20px;
-    width: 250px;
+    width: 150px;
     height: auto;
     border-radius: 50%;
   }
+
+  .main-content {
+    margin: 20px;
+  }
+
+  .main-content h2 {
+    color:#1f357a;
+  }
+
+  .main-content a {
+    color:#000000;
+  }
+
+  .main-content li {
+   margin: 10px;
+  }
+
 
