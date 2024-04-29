@@ -52,8 +52,7 @@ code {
     justify-content: center;
     align-items: center;
     border-radius: 10px;
-    height: 200%;
-
+    height: 150%;
 }
 
 .nav-link:hover {
