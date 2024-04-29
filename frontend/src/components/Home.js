@@ -1,5 +1,6 @@
 import logo from './photo.jpeg';
 
+
 function Home() {
   return (
     <div className="App">

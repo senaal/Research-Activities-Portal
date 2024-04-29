@@ -17,7 +17,7 @@ code {
     display: flex;
     align-items: center; 
     height: 30%;
-}
+
 
 .uniname {
     color: white;
@@ -63,3 +63,4 @@ code {
 .nav-link.active {
     opacity: 1;
 }
+

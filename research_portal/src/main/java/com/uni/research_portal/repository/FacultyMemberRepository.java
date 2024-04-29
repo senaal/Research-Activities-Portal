@@ -4,9 +4,13 @@ import com.uni.research_portal.model.FacultyMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FacultyMemberRepository extends JpaRepository<FacultyMember, Integer> {
     List<FacultyMember> findByIsDeletedFalse();
 
     FacultyMember findByOpenAlexId(String id);
+
+    Optional<FacultyMember> findByAuthorIdAndIsDeletedFalse(int id);
+
 }
