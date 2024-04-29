@@ -24,7 +24,7 @@ function Navbar(){
         </div>
 
         <div className='uniname'>
-            <h1>Bogazici University Research Portal</h1>      
+            <h1>BOGAZICI UNIVERSITY RESEARCH PORTAL</h1>      
         </div> 
     </div>
    

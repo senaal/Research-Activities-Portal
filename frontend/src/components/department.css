@@ -1,0 +1,53 @@
+.input {
+    justify-content: flex-end; 
+    display: flex;
+    align-items: center;
+    border-radius: 15%;
+    flex: 1; 
+}
+.submit {
+    margin-right: 10px;
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 5%;
+    background-color: #1f357a;
+    opacity: 0.5;
+    display: flex; 
+
+}
+.submit svg {
+    position: relative;
+    color:white;
+    opacity: 0.7; 
+    border-radius: 5%;
+}
+.text {
+    background-color: #1f357a;
+    color: #fff;
+    border: none;
+    width: 17.5%;
+    padding: 7px 10px;
+    border-radius: 5px;
+    opacity: 0.5;
+    cursor: pointer;
+    align-items: center; 
+}
+.text::placeholder {
+    color: white;
+}
+
+.department-page h1{
+    margin-left:1.5%;
+    color: #1f357a;
+    font-family:'Inria Sans', serif;
+
+}
+.department-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+.department-header h1 {
+    margin-right: 20px; 
+}
