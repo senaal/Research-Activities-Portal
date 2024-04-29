@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons'
+import { useParams } from 'react-router-dom'; // Import useParams from react-router-dom
 
 import './profile.css';
 
 const Profile = () => {
   const [author, setAuthor] = useState(null);
   const [articles, setArticles] = useState([]);
-
+  
+  const { id } = useParams(); // Get the id from URL params
+  
   useEffect(() => {
     const fetchData = async () => {
-      const authorResponse = await fetch('http://localhost:8080/facultymember/4');
+      const authorResponse = await fetch(`http://localhost:8080/facultymember/${id}`); // Use the id from URL
       const authorData = await authorResponse.json();
       setAuthor(authorData);
 
+      // Mock articles data
       const articlesData = [
         {
           articleId: 1,
@@ -41,7 +45,7 @@ const Profile = () => {
     };
 
     fetchData();
-  }, []);
+  }, [id]); // Make sure to include id in dependency array
 
   return (
     <div className="author">
@@ -60,7 +64,7 @@ const Profile = () => {
         </ul>
       </div>
       <div className="contact-info">
-      <img src={'https://www.cmpe.boun.edu.tr/sites/default/files/featured/person/tuna_tugcu.jpg'} alt="Author's Photo" className="author-photo" />
+      <img src={author && `${author.photo}`} alt="Author's Photo" className="author-photo" />
         <h1>{author && `${author.title} ${author.authorName}`}</h1>
         <p>{author && author.departmentId.departmentName}</p>
         <h2 style={{ marginTop: '30px' }}> {'Contact Info'}</h2>

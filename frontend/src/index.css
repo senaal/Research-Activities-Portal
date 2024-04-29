@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Poppins',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -12,7 +12,53 @@ code {
     monospace;
 }
 
-.profile {
-  font-family: Arial, sans-serif;
-  background-color: aqua;
+.header {
+  background-color: #1f357a;
+  display: flex;
+  align-items: center; 
+}
+
+.uniname {
+  color: white;
+  font-family:serif;
+  font-weight:lighter;
+  flex-grow: 1; 
+  text-align: center;
+}
+
+.unilogo img {
+  height: 80px;
+  margin-right: 20px; 
+  border-radius: 50%;
+}
+
+.navbar {
+  display: flex;
+}
+
+.nav-box {
+  flex-grow: 1; 
+  padding: 10px;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  background-color: #1f357a;
+  text-align: center;
+  opacity: 0.8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  height: 35px;
+
+}
+
+.nav-link:hover {
+  opacity: 1;
+}
+
+.nav-link.active {
+  opacity: 1;
 }
