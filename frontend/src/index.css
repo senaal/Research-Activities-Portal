@@ -16,6 +16,7 @@ code {
   background-color: #1f357a;
   display: flex;
   align-items: center; 
+  height: 30%;
 }
 
 .uniname {
@@ -27,7 +28,7 @@ code {
 }
 
 .unilogo img {
-  height: 80px;
+  height: 100px;
   margin-right: 20px; 
   border-radius: 50%;
 }
