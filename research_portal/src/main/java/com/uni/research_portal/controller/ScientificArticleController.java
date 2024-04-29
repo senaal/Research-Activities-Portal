@@ -1,6 +1,7 @@
 package com.uni.research_portal.controller;
 
 
+import com.uni.research_portal.dto.ArticleWithAuthorsDto;
 import com.uni.research_portal.model.ScientificArticle;
 import com.uni.research_portal.service.FacultyMemberService;
 import com.uni.research_portal.service.ScientificArticleService;
@@ -25,7 +26,7 @@ public class ScientificArticleController {
     }
 
     @GetMapping("/author/{id}")
-    public List<ScientificArticle> getAuthorArticles(@PathVariable int id){
+    public List<ArticleWithAuthorsDto> getAuthorArticles(@PathVariable int id){
         return scientificArticleService.getAuthorArticles(id);
     }
 

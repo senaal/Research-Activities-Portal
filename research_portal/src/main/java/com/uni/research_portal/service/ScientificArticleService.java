@@ -2,6 +2,7 @@ package com.uni.research_portal.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uni.research_portal.dto.ArticleWithAuthorsDto;
 import com.uni.research_portal.model.ArticleAuthor;
 import com.uni.research_portal.model.ExternalFacultyMember;
 import com.uni.research_portal.model.FacultyMember;
@@ -125,18 +126,35 @@ public class ScientificArticleService {
         }
     }
 
-    public List<ScientificArticle> getAuthorArticles(int authorId) {
-        ArrayList<ScientificArticle> responseArticles = new ArrayList<>();
-        try{
-            List<ArticleAuthor> articleAuthors = articleAuthorRepository.findByAuthorId(authorId);
-            for (ArticleAuthor articleAuthor : articleAuthors) {
-                Optional<ScientificArticle> article = scientificArticleRepository.findByArticleIdAndIsRejectedFalse(articleAuthor.getScientificArticle().getArticleId());
-                article.ifPresent(responseArticles::add);
+    public List<ArticleWithAuthorsDto> getAuthorArticles(int authorId) {
+        ArrayList<ArticleWithAuthorsDto> responseArticles = new ArrayList<>();
+        List<ArticleAuthor> articleAuthors = articleAuthorRepository.findByAuthorId(authorId);
+
+        for (ArticleAuthor articleAuthor : articleAuthors) {
+            List<ArticleAuthor> authorIds = articleAuthorRepository.findByScientificArticle(articleAuthor.getScientificArticle());
+            List<String> authorNames = new ArrayList<>();
+
+            for (ArticleAuthor auth: authorIds){
+                String memberName;
+                if(auth.getIsFacultyMember()){
+                    memberName = facultyMemberRepository.findByAuthorIdAndIsDeletedFalse(auth.getAuthorId()).get().getAuthorName();
+                } else {
+                    memberName = externalFacultyMemberRepository.findByExternalAuthorId(auth.getAuthorId()).getAuthorName();
+                }
+                authorNames.add(memberName);
             }
-            return responseArticles;
-        }catch(Exception e){
-            return responseArticles;
+
+            Optional<ScientificArticle> article = scientificArticleRepository.findByArticleIdAndIsRejectedFalse(articleAuthor.getScientificArticle().getArticleId());
+
+            article.ifPresent(articleObj -> {
+                ArticleWithAuthorsDto articleDTO = new ArticleWithAuthorsDto();
+                articleDTO.setArticle(articleObj);
+                articleDTO.setAuthorNames(authorNames);
+                responseArticles.add(articleDTO);
+            });
         }
+
+        return responseArticles;
     }
 }
 
