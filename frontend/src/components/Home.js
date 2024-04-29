@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+import logo from './photo.jpeg';
 
 function Home() {
   return (
