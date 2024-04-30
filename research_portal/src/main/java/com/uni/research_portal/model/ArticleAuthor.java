@@ -27,5 +27,11 @@ public class ArticleAuthor {
     @Column
     private Boolean isFacultyMember;
 
+    @Column
+    private int citationCount;
+
+    @Column
+    private java.sql.Timestamp publicationDate;
+
 }
 
