@@ -6,11 +6,9 @@ import com.uni.research_portal.model.ScientificArticle;
 import com.uni.research_portal.service.FacultyMemberService;
 import com.uni.research_portal.service.ScientificArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,8 +24,16 @@ public class ScientificArticleController {
     }
 
     @GetMapping("/author/{id}")
-    public List<ArticleWithAuthorsDto> getAuthorArticles(@PathVariable int id){
-        return scientificArticleService.getAuthorArticles(id);
+    public Page<ArticleWithAuthorsDto> getAuthorArticles(@PathVariable int id,
+                                                         @RequestParam(defaultValue = "publicationDate") String sortBy,
+                                                         @RequestParam(defaultValue = "DESC") String sortOrder,
+                                                         @RequestParam(required = false) Integer page,
+                                                         @RequestParam(required = false) Integer size
+        ){
+
+        int pageNum = page != null ? page : 0;
+        int pageSize = size != null ? size : 10;
+        return scientificArticleService.getAuthorArticles(id,sortBy,sortOrder,pageNum,pageSize);
     }
 
 }

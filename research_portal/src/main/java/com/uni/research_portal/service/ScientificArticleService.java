@@ -12,6 +12,10 @@ import com.uni.research_portal.repository.ExternalFacultyMemberRepository;
 import com.uni.research_portal.repository.FacultyMemberRepository;
 import com.uni.research_portal.repository.ScientificArticleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -126,11 +130,12 @@ public class ScientificArticleService {
         }
     }
 
-    public List<ArticleWithAuthorsDto> getAuthorArticles(int authorId) {
-        ArrayList<ArticleWithAuthorsDto> responseArticles = new ArrayList<>();
-        List<ArticleAuthor> articleAuthors = articleAuthorRepository.findByAuthorId(authorId);
+    public Page<ArticleWithAuthorsDto> getAuthorArticles(int authorId, String sortBy, String sortOrder, int pageNumber, int pageSize) {
+        Sort.Direction direction = Sort.Direction.fromString(sortOrder);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
+        Page<ArticleAuthor> articleAuthorsPage = articleAuthorRepository.findByAuthorId(authorId, pageable);
 
-        for (ArticleAuthor articleAuthor : articleAuthors) {
+        return articleAuthorsPage.map(articleAuthor -> {
             List<ArticleAuthor> authorIds = articleAuthorRepository.findByScientificArticle(articleAuthor.getScientificArticle());
             List<String> authorNames = new ArrayList<>();
 
@@ -146,15 +151,13 @@ public class ScientificArticleService {
 
             Optional<ScientificArticle> article = scientificArticleRepository.findByArticleIdAndIsRejectedFalse(articleAuthor.getScientificArticle().getArticleId());
 
-            article.ifPresent(articleObj -> {
+            return article.map(articleObj -> {
                 ArticleWithAuthorsDto articleDTO = new ArticleWithAuthorsDto();
                 articleDTO.setArticle(articleObj);
                 articleDTO.setAuthorNames(authorNames);
-                responseArticles.add(articleDTO);
-            });
-        }
-
-        return responseArticles;
+                return articleDTO;
+            }).orElse(null); // Or throw an exception if article is not present
+        });
     }
 }
 
