@@ -150,6 +150,11 @@
   cursor: not-allowed;
 }
 
+.number-of{
+  margin-top: 30px;
+
+}
+
 .article-count-circle,
 .project-count-circle {
   width: 32px; 
