@@ -9,7 +9,7 @@ public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_id")
-    private Long projectId;
+    private int projectId;
 
     @Column(nullable = false)
     private String projectName;

@@ -2,9 +2,13 @@ package com.uni.research_portal.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uni.research_portal.dto.AuthorInfoDto;
 import com.uni.research_portal.model.FacultyMember;
+import com.uni.research_portal.repository.ArticleAuthorRepository;
 import com.uni.research_portal.repository.FacultyMemberRepository;
 import com.uni.research_portal.exception.ResourceNotFoundException;
+import com.uni.research_portal.repository.ProjectAuthorRepository;
+import com.uni.research_portal.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -24,6 +28,12 @@ public class FacultyMemberService {
 
     @Autowired
     FacultyMemberRepository facultyMemberRepository;
+
+    @Autowired
+    ArticleAuthorRepository articleAuthorRepository;
+
+    @Autowired
+    ProjectAuthorRepository projectAuthorRepository;
     public void updateMembers(String id) {
         try{
             String url = "https://api.openalex.org/authors/" + id;
@@ -64,10 +74,17 @@ public class FacultyMemberService {
         }
     }
 
-    public FacultyMember getAuthorInfo(int authorId) {
+    public AuthorInfoDto getAuthorInfo(int authorId) {
         Optional<FacultyMember> member = facultyMemberRepository.findByAuthorIdAndIsDeletedFalse(authorId);
         if(member.isPresent()){
-            return member.get();
+            AuthorInfoDto response = new AuthorInfoDto();
+            response.setMember(member.get());
+            int articleCount = articleAuthorRepository.countByAuthorId(member.get().getAuthorId());
+            int projectCount = projectAuthorRepository.countByAuthorId(member.get().getAuthorId());
+            response.setNumberOfArticles(articleCount);
+            response.setNumberOfProjects(projectCount);
+            return response;
+
         }
         else{
             throw new ResourceNotFoundException(String.format("Faculty member with id %s is not found", authorId));

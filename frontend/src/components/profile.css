@@ -149,3 +149,23 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
+
+.article-count-circle,
+.project-count-circle {
+  width: 32px; 
+  height: 32px; 
+  background-color: #1f357a; 
+  color: #fff; 
+  border-radius: 50%; 
+  display: inline-flex; 
+  justify-content: center; 
+  align-items: center;
+  margin-right: 5px; 
+}
+
+.article-count-label,
+.project-count-label {
+  display: inline-block; 
+  vertical-align: middle; 
+}
+

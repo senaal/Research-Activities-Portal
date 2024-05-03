@@ -19,7 +19,10 @@ const Profile = () => {
       try {
         // Fetch author data
         const authorResponse = await fetch(`http://localhost:8080/facultymember/${id}`);
-        const authorData = await authorResponse.json();
+        let data = await authorResponse.json();
+        let authorData = data.member;
+        authorData.articleCount = data.numberOfArticles;
+        authorData.projectCount = data.numberOfProjects;
         setAuthor(authorData);
 
         // Fetch articles data for the author with pagination
@@ -144,6 +147,26 @@ const Profile = () => {
         <p><FontAwesomeIcon icon={faPhone} /> {author && author.phone} </p>
         <p style={{ marginTop: '60px' }}> <img src={require("./photos/index.PNG")}  alt="Index " className="icon" /> <strong>h-index:</strong> {author && author.hindex}</p>
         <p><img src={require("./photos/index.PNG")} alt="Index "  className="icon" /> <strong>Citation Count:</strong> {author && author.citedByCount}</p>
+        <div className="number-of">
+        <div className="count">
+          <div className="article-count-circle">
+            <span>{author && author.articleCount}</span>
+          </div>
+          <p className="article-count-label"><strong>Articles</strong> </p>
+        </div>
+        <div className="count">
+          <div className="project-count-circle">
+            <span>{author && author.projectCount}</span>
+          </div>
+          <p className="project-count-label"><strong>Projects</strong> </p>
+        </div>
+        <div className="count">
+          <div className="project-count-circle">
+            <span>{7}</span>
+          </div>
+          <p className="project-count-label"><strong>Research Areas</strong> </p>
+        </div>
+      </div>
       </div>
       
     </div>

@@ -1,6 +1,7 @@
 package com.uni.research_portal.controller;
 
 
+import com.uni.research_portal.dto.AuthorInfoDto;
 import com.uni.research_portal.model.FacultyMember;
 import com.uni.research_portal.model.ScientificArticle;
 import com.uni.research_portal.service.FacultyMemberService;
@@ -25,7 +26,7 @@ public class FacultyMemberController {
     }
 
     @GetMapping("/{id}")
-    public FacultyMember getAuthorInfo(@PathVariable int id){
+    public AuthorInfoDto getAuthorInfo(@PathVariable int id){
         return facultyMemberService.getAuthorInfo(id);
     }
 
