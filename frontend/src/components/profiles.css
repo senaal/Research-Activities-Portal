@@ -1,0 +1,44 @@
+.scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap; /* This ensures that all the content stays on a single line */
+  height: 240px; 
+}
+
+.scroll-item {
+  display: inline-block;
+  width: 300px; 
+  height: 200px; 
+  margin-right: 10px;
+  border: 2px solid #1f357a;
+  border-radius: 10px;
+}
+
+.scroll-item p {
+  text-align: center;
+  font-weight:bold ;
+}
+
+.scroll-item img {
+  align-items: center;
+}
+
+.department h1{
+  font-size: 20px;
+  font-weight: bold;
+  color: #000000;
+  margin-bottom: 20px;
+}
+
+.photo {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  border-radius: 50%;
+  margin-top: 10px;
+}
+
+.scroll-item:hover {
+  background-color: #a9aaac;
+}
