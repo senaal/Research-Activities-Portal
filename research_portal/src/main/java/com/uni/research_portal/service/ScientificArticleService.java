@@ -3,14 +3,9 @@ package com.uni.research_portal.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uni.research_portal.dto.ArticleWithAuthorsDto;
-import com.uni.research_portal.model.ArticleAuthor;
-import com.uni.research_portal.model.ExternalFacultyMember;
-import com.uni.research_portal.model.FacultyMember;
-import com.uni.research_portal.model.ScientificArticle;
-import com.uni.research_portal.repository.ArticleAuthorRepository;
-import com.uni.research_portal.repository.ExternalFacultyMemberRepository;
-import com.uni.research_portal.repository.FacultyMemberRepository;
-import com.uni.research_portal.repository.ScientificArticleRepository;
+import com.uni.research_portal.dto.DepartmentArticlesDto;
+import com.uni.research_portal.model.*;
+import com.uni.research_portal.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,6 +40,8 @@ public class ScientificArticleService {
     FacultyMemberRepository facultyMemberRepository;
     @Autowired
     ExternalFacultyMemberRepository externalFacultyMemberRepository;
+    @Autowired
+    DepartmentRepository departmentRepository;
     public void updateArticlesWithOpenAlex(String id) {
         try{
             String url = "https://api.openalex.org/works?filter=author.id:" + id;
@@ -158,6 +155,12 @@ public class ScientificArticleService {
                 return articleDTO;
             }).orElse(null); // Or throw an exception if article is not present
         });
+    }
+
+    public List<DepartmentArticlesDto> getArticlesByDepartment(int departmentId) {
+        Department department = departmentRepository.findByDepartmentId(departmentId).get();
+
+        return scientificArticleRepository.findByDepartmentId(departmentId);
     }
 }
 
