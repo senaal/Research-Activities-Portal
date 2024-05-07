@@ -1,6 +1,7 @@
 package com.uni.research_portal.controller;
 
 
+import com.uni.research_portal.dto.ArticleWithAllAuthors;
 import com.uni.research_portal.dto.ArticleWithAuthorsDto;
 import com.uni.research_portal.dto.DepartmentArticlesDto;
 import com.uni.research_portal.model.Department;
@@ -38,7 +39,7 @@ public class ScientificArticleController {
         return scientificArticleService.getAuthorArticles(id,sortBy,sortOrder,pageNum,pageSize);
     }
     @GetMapping("/department/{departmentId}")
-    public List<DepartmentArticlesDto> getArticlesByDepartment(@PathVariable Integer departmentId) {
+    public List<ArticleWithAllAuthors> getArticlesByDepartment(@PathVariable Integer departmentId) {
         return scientificArticleService.getArticlesByDepartment(departmentId);
     }
 }

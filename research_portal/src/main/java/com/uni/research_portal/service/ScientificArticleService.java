@@ -2,8 +2,7 @@ package com.uni.research_portal.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.uni.research_portal.dto.ArticleWithAuthorsDto;
-import com.uni.research_portal.dto.DepartmentArticlesDto;
+import com.uni.research_portal.dto.*;
 import com.uni.research_portal.model.*;
 import com.uni.research_portal.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +20,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ScientificArticleService {
@@ -77,6 +77,7 @@ public class ScientificArticleService {
                                 articleAuthor.setScientificArticle(newArticle);
                                 String openAlexId = authorNode.get("author").get("id").asText().substring(authorNode.get("author").get("id").asText().lastIndexOf("/") + 1);
                                 FacultyMember facultyMember = facultyMemberRepository.findByOpenAlexId(openAlexId);
+                                System.out.println(facultyMember);
                                 if(facultyMember == null){
                                     ExternalFacultyMember externalFacultyMember = externalFacultyMemberRepository.findByOpenAlexId(openAlexId);
                                     articleAuthor.setIsFacultyMember(false);
@@ -157,10 +158,33 @@ public class ScientificArticleService {
         });
     }
 
-    public List<DepartmentArticlesDto> getArticlesByDepartment(int departmentId) {
-        Department department = departmentRepository.findByDepartmentId(departmentId).get();
+    public List<ArticleWithAllAuthors> getArticlesByDepartment(int departmentId) {
+        Department department = departmentRepository.findByDepartmentId(departmentId).orElse(null);
+        if (department == null) {
+            return new ArrayList<>();
+        }
 
-        return scientificArticleRepository.findByDepartmentId(departmentId);
+        List<DepartmentArticlesDto> departmentArticles = scientificArticleRepository.findByDepartmentId(departmentId);
+        List<ExternalFacultyMemberDto> externalAuthors = scientificArticleRepository.findArticlesWithAuthors();
+        List<ArticleWithAllAuthors> articlesWithAllAuthors = new ArrayList<>();
+
+        for (DepartmentArticlesDto departmentDto : departmentArticles) {
+            List<String> externalAuthorsForArticle = externalAuthors.stream()
+                    .filter(externalDto -> departmentDto.getArticle().getArticleId().equals(externalDto.getArticle().getArticleId()))
+                    .map(ExternalFacultyMemberDto::getAuthorName)
+                    .collect(Collectors.toList());
+
+            List<String> allAuthors = new ArrayList<>();
+            allAuthors.addAll(Arrays.asList(departmentDto.getAuthorName().split(", ")));            externalAuthorsForArticle.forEach(externalAuthor -> allAuthors.addAll(Arrays.asList(externalAuthor.split(", "))));
+            ArticleWithAllAuthors articleWithAllAuthors = new ArticleWithAllAuthors(departmentDto.getArticle(), allAuthors, departmentDto.getDepartmentId());
+            articlesWithAllAuthors.add(articleWithAllAuthors);
+        }
+
+        return articlesWithAllAuthors;
     }
+
+
+
+
 }
 

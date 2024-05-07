@@ -1,6 +1,7 @@
 package com.uni.research_portal.repository;
 
 import com.uni.research_portal.dto.DepartmentArticlesDto;
+import com.uni.research_portal.dto.ExternalFacultyMemberDto;
 import com.uni.research_portal.model.Department;
 import com.uni.research_portal.model.FacultyMember;
 import com.uni.research_portal.model.ScientificArticle;
@@ -17,13 +18,20 @@ public interface ScientificArticleRepository extends JpaRepository<ScientificArt
 
     Optional<ScientificArticle> findByArticleIdAndIsRejectedFalse(int id);
 
-    @Query("SELECT NEW com.uni.research_portal.dto.DepartmentArticlesDto(sa, fm.authorName, d.departmentId) " +
+    @Query("SELECT NEW com.uni.research_portal.dto.DepartmentArticlesDto(sa, CAST(string_agg(fm.authorName, ', ') AS text), d.departmentId) " +
             "FROM ScientificArticle sa " +
             "JOIN ArticleAuthor aa ON sa.articleId = aa.scientificArticle.articleId " +
             "JOIN FacultyMember fm ON aa.authorId = fm.authorId " +
             "JOIN Department d ON fm.departmentId.departmentId = d.departmentId " +
-            "WHERE d.departmentId = :departmentId")
+            "WHERE d.departmentId = :departmentId " +
+            "GROUP BY sa.articleId, d.departmentId")
     List<DepartmentArticlesDto> findByDepartmentId(@Param("departmentId") int departmentId);
 
+    @Query("SELECT new com.uni.research_portal.dto.ExternalFacultyMemberDto(sa, CAST(string_agg(efm.authorName, ', ') AS text)) " +
+            "FROM ScientificArticle sa " +
+            "JOIN ArticleAuthor aa ON sa.articleId = aa.scientificArticle.articleId " +
+            "JOIN ExternalFacultyMember efm ON aa.authorId = efm.externalAuthorId " +
+            "GROUP BY sa.articleId")
+    List<ExternalFacultyMemberDto> findArticlesWithAuthors();
 }
 

@@ -3,15 +3,15 @@ package com.uni.research_portal.dto;
 import com.uni.research_portal.model.ScientificArticle;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class DepartmentArticlesDto {
         private ScientificArticle article;
         private String authorName;
         private Integer departmentId;
-
 
     // Getters and setters
         public ScientificArticle getArticle() {
