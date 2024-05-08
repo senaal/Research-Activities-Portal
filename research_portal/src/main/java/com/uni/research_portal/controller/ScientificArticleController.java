@@ -1,7 +1,10 @@
 package com.uni.research_portal.controller;
 
 
+import com.uni.research_portal.dto.ArticleWithAllAuthors;
 import com.uni.research_portal.dto.ArticleWithAuthorsDto;
+import com.uni.research_portal.dto.DepartmentArticlesDto;
+import com.uni.research_portal.model.Department;
 import com.uni.research_portal.model.ScientificArticle;
 import com.uni.research_portal.service.FacultyMemberService;
 import com.uni.research_portal.service.ScientificArticleService;
@@ -35,5 +38,20 @@ public class ScientificArticleController {
         int pageSize = size != null ? size : 10;
         return scientificArticleService.getAuthorArticles(id,sortBy,sortOrder,pageNum,pageSize);
     }
+    @GetMapping("/department/{departmentId}")
+    public List<ArticleWithAllAuthors> getArticlesByDepartment(@PathVariable Integer departmentId) {
+        return scientificArticleService.getArticlesByDepartment(departmentId);
+    }
 
+    @GetMapping("/scientific_articles")
+    public Page<ArticleWithAuthorsDto> getAllArticles(   @RequestParam(defaultValue = "publicationDate") String sortBy,
+                                                         @RequestParam(defaultValue = "DESC") String sortOrder,
+                                                         @RequestParam(required = false) Integer page,
+                                                         @RequestParam(required = false) Integer size
+    ){
+
+        int pageNum = page != null ? page : 0;
+        int pageSize = size != null ? size : 10;
+        return scientificArticleService.getScientificArticles(sortBy,sortOrder,pageNum,pageSize);
+    }
 }

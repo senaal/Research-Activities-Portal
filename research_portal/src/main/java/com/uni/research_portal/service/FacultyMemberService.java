@@ -56,7 +56,6 @@ public class FacultyMemberService {
                     facultyMember.setCitedByCount(jsonNode.get("cited_by_count").asInt());
                     facultyMember.setHIndex(jsonNode.get("summary_stats").get("h_index").asInt());
                     facultyMember.setI10Index(jsonNode.get("summary_stats").get("i10_index").asInt());
-                    System.out.println(jsonNode.get("display_name"));
                     facultyMemberRepository.save(facultyMember);
                 }
             } catch (Exception ignored) {}
