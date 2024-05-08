@@ -2,11 +2,13 @@ package com.uni.research_portal.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @Table(name = "faculty")
 public class Faculty {
     @Id
@@ -15,4 +17,7 @@ public class Faculty {
 
     private String facultyName;
 
+    public Faculty(String facultyName) {
+        this.facultyName = facultyName;
+    }
 }
