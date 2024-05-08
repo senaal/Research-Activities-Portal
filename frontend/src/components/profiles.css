@@ -1,7 +1,7 @@
 .scroll-container {
   width: 100%;
   overflow-x: auto;
-  white-space: nowrap; /* This ensures that all the content stays on a single line */
+  white-space: nowrap; 
   height: 240px; 
 }
 
