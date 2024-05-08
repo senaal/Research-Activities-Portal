@@ -1,18 +1,19 @@
 package com.uni.research_portal.dto;
 
+import com.uni.research_portal.model.Department;
 import com.uni.research_portal.model.ScientificArticle;
 import java.util.List;
 
 public class ArticleWithAllAuthors {
     private ScientificArticle article;
     private List<String> authors;
-    private Integer departmentId;
+    private Department department;
 
     // Constructor
-    public ArticleWithAllAuthors(ScientificArticle article, List<String> authors, Integer departmentId) {
+    public ArticleWithAllAuthors(ScientificArticle article, List<String> authors, Department department) {
         this.article = article;
         this.authors = authors;
-        this.departmentId = departmentId;
+        this.department = department;
     }
 
     // Getters and setters
@@ -32,11 +33,11 @@ public class ArticleWithAllAuthors {
         this.authors = authors;
     }
 
-    public Integer getDepartmentId() {
-        return departmentId;
+    public Department getDepartment() {
+        return department;
     }
 
-    public void setDepartmentId(Integer departmentId) {
-        this.departmentId = departmentId;
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 }

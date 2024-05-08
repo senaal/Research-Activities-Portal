@@ -18,7 +18,7 @@ public interface ScientificArticleRepository extends JpaRepository<ScientificArt
 
     Optional<ScientificArticle> findByArticleIdAndIsRejectedFalse(int id);
 
-    @Query("SELECT NEW com.uni.research_portal.dto.DepartmentArticlesDto(sa, CAST(string_agg(fm.authorName, ', ') AS text), d.departmentId) " +
+    @Query("SELECT NEW com.uni.research_portal.dto.DepartmentArticlesDto(sa, CAST(string_agg(fm.authorName, ', ') AS text), d) " +
             "FROM ScientificArticle sa " +
             "JOIN ArticleAuthor aa ON sa.articleId = aa.scientificArticle.articleId " +
             "JOIN FacultyMember fm ON aa.authorId = fm.authorId " +

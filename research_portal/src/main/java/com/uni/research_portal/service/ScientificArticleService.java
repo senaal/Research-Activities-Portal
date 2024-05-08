@@ -176,15 +176,42 @@ public class ScientificArticleService {
 
             List<String> allAuthors = new ArrayList<>();
             allAuthors.addAll(Arrays.asList(departmentDto.getAuthorName().split(", ")));            externalAuthorsForArticle.forEach(externalAuthor -> allAuthors.addAll(Arrays.asList(externalAuthor.split(", "))));
-            ArticleWithAllAuthors articleWithAllAuthors = new ArticleWithAllAuthors(departmentDto.getArticle(), allAuthors, departmentDto.getDepartmentId());
+            ArticleWithAllAuthors articleWithAllAuthors = new ArticleWithAllAuthors(departmentDto.getArticle(), allAuthors, departmentDto.getDepartment());
             articlesWithAllAuthors.add(articleWithAllAuthors);
         }
 
         return articlesWithAllAuthors;
     }
 
+    public Page<ArticleWithAuthorsDto> getScientificArticles(String sortBy, String sortOrder, int pageNumber, int pageSize) {
+        Sort.Direction direction = Sort.Direction.fromString(sortOrder);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
+        Page<ScientificArticle> articleAuthorsPage = scientificArticleRepository.findAll(pageable);
 
+        return articleAuthorsPage.map(articleDto -> {
+            List<ArticleAuthor> authorIds = articleAuthorRepository.findByScientificArticle(articleDto);
+            List<String> authorNames = new ArrayList<>();
 
+            for (ArticleAuthor auth: authorIds){
+                String memberName;
+                if(auth.getIsFacultyMember()){
+                    memberName = facultyMemberRepository.findByAuthorIdAndIsDeletedFalse(auth.getAuthorId()).get().getAuthorName();
+                } else {
+                    memberName = externalFacultyMemberRepository.findByExternalAuthorId(auth.getAuthorId()).getAuthorName();
+                }
+                authorNames.add(memberName);
+            }
+
+            Optional<ScientificArticle> article = scientificArticleRepository.findByArticleIdAndIsRejectedFalse(articleDto.getArticleId());
+
+            return article.map(articleObj -> {
+                ArticleWithAuthorsDto articleDTO = new ArticleWithAuthorsDto();
+                articleDTO.setArticle(articleObj);
+                articleDTO.setAuthorNames(authorNames);
+                return articleDTO;
+            }).orElse(null);
+        });
+    }
 
 }
 
