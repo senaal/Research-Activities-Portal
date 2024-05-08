@@ -39,8 +39,8 @@
 
   .author{
     background-color: #ffffff;
-    display: flex; /* Use flexbox layout */
-    justify-content: space-between; /* Spread the main content and contact info apart */
+    display: flex; 
+    justify-content: space-between;
   }
 
   .article-title {
@@ -55,12 +55,12 @@
 
   
   .main-content {
-    width: 80%; /* Adjust the width as needed */
+    width: 80%; 
   }
   
   .contact-info {
-    width: 20%; /* Adjust the width as needed */
-    text-align: center; /* Align the content to the right */
+    width: 20%; 
+    text-align: center; 
     border: 2px solid #000000;
     border-radius: 15px;
     margin: 15px;
@@ -85,9 +85,9 @@
   }
 
   .icon {
-    width: 20px; /* Set the width of the icon */
-    height: auto; /* Let the height adjust automatically to maintain aspect ratio */
-    vertical-align: middle; /* Align the icon vertically in the middle */
+    width: 20px; 
+    height: auto; 
+    vertical-align: middle; 
   }
 
   .author-photo {
