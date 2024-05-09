@@ -1,5 +1,6 @@
 .author {
     font-family: Arial, sans-serif;
+    display: flex;
   }
   
   .author h1 {
@@ -90,6 +91,20 @@
     vertical-align: middle; 
   }
 
+  .contact-line p{
+    text-align: left;
+    margin-left: 50px;
+  }
+
+  .count{
+    text-align: left;
+  }
+
+  .count h3{
+    font-size: 16px;
+    margin:5px;
+  }
+
   .author-photo {
     margin: 20px;
     width: 150px;
@@ -152,6 +167,8 @@
 
 .number-of{
   margin-top: 30px;
+  text-align: left;
+  margin-left: 50px;
 
 }
 
@@ -174,3 +191,37 @@
   vertical-align: middle; 
 }
 
+.tabs {
+  display: flex;
+  justify-content: left;
+  margin-top: 20px;
+}
+
+.tabs button {
+  border-radius: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  margin-right: 20px;
+  color: #1f357a; 
+  height: 30px;
+
+}
+
+.tabs button:focus {
+  outline: none;
+}
+
+.tabs button:hover {
+  opacity: 0.8; 
+  border: 2px solid #bbc3eb;
+  border-radius: 4px;
+  background-color: #bbc3eb;
+
+}
+
+.tabs button.active {
+  text-decoration: underline; 
+  font-weight: bold;
+}
