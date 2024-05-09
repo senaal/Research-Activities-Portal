@@ -1,7 +1,32 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { FaSearch } from 'react-icons/fa'; 
 import logo from './photos/photo.jpeg';
+const SearchBar = ({ onSearch }) => {
+  const [query, setQuery] = useState('');
 
+  const handleChange = (event) => {
+    setQuery(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onSearch(query);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className='nav-link'>
+      <input
+        placeholder='Search'
+        value={query}
+        onChange={handleChange}
+      />
+      <button >
+        <FaSearch />
+      </button>
+    </form>
+  );
+};
 function Navbar(){
     useEffect(() => {
         const navLinks = document.querySelectorAll('.nav-link');
@@ -15,6 +40,9 @@ function Navbar(){
           });
         });
       }, []);
+      const handleSearch = (query) => {
+        console.log("Searching for:", query);
+      }; 
   return (
     <div>
 
@@ -29,6 +57,11 @@ function Navbar(){
     </div>
    
       <nav className='navbar'>
+      <div className='nav-box'>
+          <Link to="/faculty" className='nav-link'>
+            Faculties
+          </Link>
+        </div>
         <div className='nav-box'>
           <Link to="/department" className='nav-link'>
             Departments
@@ -36,18 +69,11 @@ function Navbar(){
         </div>
         <div className='nav-box'>
             <Link to="/profiles" className='nav-link'>
-            Profiles
+            Faculty Members
           </Link>
         </div>
         <div className='nav-box'>
-            <Link to="/scientific-articles" className='nav-link'>
-            Scientific Articles
-          </Link>
-        </div>
-        <div className='nav-box'>
-          <Link to="/projects" className='nav-link'>
-            Projects
-          </Link>
+          <SearchBar onSearch={handleSearch} />
         </div>
       </nav>
     </div>
