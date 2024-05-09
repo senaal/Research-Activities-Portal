@@ -2,6 +2,9 @@ package com.uni.research_portal.model;
 
 import jakarta.persistence.*;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 @Entity
 @Table(name = "project")
 public class Project {
@@ -15,7 +18,13 @@ public class Project {
     private String projectName;
 
     @Column(name = "start_date")
-    private java.sql.Timestamp startDate;
+    private Date startDate;
     @Column(name = "end_date")
-    private java.sql.Timestamp endDate;
+    private Date endDate;
+
+    public Project(String projectName, Date startDate, Date endDate) {
+        this.projectName = projectName;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 }

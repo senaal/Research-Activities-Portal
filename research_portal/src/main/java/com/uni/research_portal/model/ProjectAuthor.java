@@ -1,8 +1,12 @@
 package com.uni.research_portal.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "project_author")
 public class ProjectAuthor {
 
@@ -18,5 +22,13 @@ public class ProjectAuthor {
     @Column
     private Integer authorId;
 
+    @Column
+    private boolean isFacultyMember;
+
+    public ProjectAuthor(Project project, Integer authorId, Boolean isFacultyMember) {
+        this.project = project;
+        this.authorId = authorId;
+        this.isFacultyMember = isFacultyMember;
+    }
 }
 
