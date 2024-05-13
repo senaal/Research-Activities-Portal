@@ -111,6 +111,11 @@ public class FacultyMemberService {
         return response;
     }
 
+    public List<FacultyMember> getAllMembers() {
+        List<FacultyMember> members = facultyMemberRepository.findByIsDeletedFalse();
+        return members;
+    }
+
     public FacultyMember createFacultyMember(CreateAuthorRequestDto createAuthorRequestDto){
         Department department = departmentRepository.findByDepartmentId(createAuthorRequestDto.getDepartmentId()).get();
         FacultyMember newMember = new FacultyMember();
