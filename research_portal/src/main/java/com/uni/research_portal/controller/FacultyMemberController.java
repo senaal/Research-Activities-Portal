@@ -34,6 +34,11 @@ public class FacultyMemberController {
         return facultyMemberService.getMembers();
     }
 
+    @GetMapping("/all")
+    public List<FacultyMember> getMembers(){
+        return facultyMemberService.getAllMembers();
+    }
+
     @PostMapping("/")
     public FacultyMember createFacultyMember(@RequestBody CreateAuthorRequestDto createAuthorRequestDto){
         return facultyMemberService.createFacultyMember(createAuthorRequestDto);
