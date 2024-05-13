@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Department from './components/Department';
 import ProfilesPage from './components/Profiles';
 import Article from './components/Articles';
+import Admin from './components/Admin';
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
       <Route className="department" path="/department/:id" element={<Department/>} />
       <Route className="profiles" path="/profiles" element={<ProfilesPage/>} />
       <Route className="articles" path="/scientific-articles" element={<Article/>} />
+      <Route className="admin" path="/admin" element={<Admin/>} />
       </Routes>
     </BrowserRouter>
   );
