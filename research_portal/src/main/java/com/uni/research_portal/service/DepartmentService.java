@@ -6,6 +6,8 @@ import com.uni.research_portal.model.Faculty;
 import com.uni.research_portal.repository.DepartmentRepository;
 import com.uni.research_portal.repository.FacultyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,5 +30,16 @@ public class DepartmentService {
         departmentRepository.save(newDepartment);
         return newDepartment;
     }
+
+    public ResponseEntity<String> deleteDepartment(int id){
+        departmentRepository.deleteById(id);
+        return new ResponseEntity<>("Department is deleted", HttpStatus.OK);
+    }
+
+    public List<Department> getDepartments(){
+        List<Department> departments = departmentRepository.findAll();
+        return departments;
+    }
+
 
 }
