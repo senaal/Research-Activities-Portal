@@ -24,7 +24,7 @@
   
   button {
     padding: 5px 10px;
-    background-color: #007bff;
+    background-color: #1f357a;
     color: white;
     border: none;
     border-radius: 3px;
@@ -34,4 +34,23 @@
   button:hover {
     background-color: #0056b3;
   }
+
+  .confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  }
+  
+  .confirm {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
   
