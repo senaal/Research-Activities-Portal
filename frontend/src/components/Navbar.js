@@ -1,57 +1,83 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FaSearch } from 'react-icons/fa'; 
 import logo from './photos/photo.jpeg';
+import './navbar.css';
 
-function Navbar(){
-    useEffect(() => {
-        const navLinks = document.querySelectorAll('.nav-link');
-    
-        navLinks.forEach(function(link) {
-          link.addEventListener('click', function() {
-            navLinks.forEach(function(navLink) {
-              navLink.classList.remove('active');
-            });
-            this.classList.add('active');
-          });
-        });
-      }, []);
+const SearchBar = ({ onSearch }) => {
+  const [query, setQuery] = useState('');
+
+  const handleChange = (event) => {
+    setQuery(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onSearch(query);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder='Search'
+        value={query}
+        onChange={handleChange}
+      />
+      <button type="submit">
+        <FaSearch />
+      </button>
+    </form>
+  );
+};
+
+function Navbar() {
+  const [showFacultyDropdown, setShowFacultyDropdown] = useState(false);
+  const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
+
   return (
     <div>
-
-    <div className='header'>
-        <div className='unilogo'>
+      <div className='header'>
+      <Link to="/"> 
+          <div className='unilogo'>
             <img src={logo} alt="logo" />
-        </div>
-
+          </div>
+        </Link>
         <div className='uniname'>
-            <h1>BOGAZICI UNIVERSITY RESEARCH PORTAL</h1>      
+          <h1>BOGAZICI UNIVERSITY RESEARCH PORTAL</h1>      
         </div> 
-    </div>
+      </div>
    
       <nav className='navbar'>
         <div className='nav-box'>
-          <Link to="/department" className='nav-link'>
-            Departments
-          </Link>
+          <div className="dropdown-box" onMouseEnter={() => setShowFacultyDropdown(true)} onMouseLeave={() => setShowFacultyDropdown(false)}>
+            <span className="dropdown-name">Faculties</span> 
+            {showFacultyDropdown && (
+              <div className="dropdown-content faculty-dropdown">
+                <Link to="/faculty1" className='nav-link' key="faculty1">Faculty 1</Link>
+                <Link to="/faculty2" className='nav-link' key="faculty2">Faculty 2</Link>
+              </div>
+            )}
+          </div>
         </div>
+
         <div className='nav-box'>
-            <Link to="/profiles" className='nav-link'>
-            Profiles
-          </Link>
+          <div className="dropdown-box" onMouseEnter={() => setShowDepartmentDropdown(true)} onMouseLeave={() => setShowDepartmentDropdown(false)}>
+            <span className="dropdown-name">Departments</span> 
+            {showDepartmentDropdown && (
+              <div className="dropdown-content department-dropdown">
+                <Link to="/department/1" className='nav-link' key="department1">Computer Engineering</Link>
+                <Link to="/department/2" className='nav-link' key="department2">Department 2</Link>
+              </div>
+            )}
+          </div>
         </div>
+
         <div className='nav-box'>
-            <Link to="/scientific-articles" className='nav-link'>
-            Scientific Articles
-          </Link>
-        </div>
-        <div className='nav-box'>
-          <Link to="/projects" className='nav-link'>
-            Projects
-          </Link>
+          <SearchBar />
         </div>
       </nav>
     </div>
   );
-};
+}
 
 export default Navbar;

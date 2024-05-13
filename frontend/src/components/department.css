@@ -58,10 +58,12 @@
 }
 
 .chart {
-    margin-left: 10px; 
     flex: 1;
 }
 
 .articles h2{
     margin-left: 20px;
+}
+.articles a{
+    color: #000000
 }
