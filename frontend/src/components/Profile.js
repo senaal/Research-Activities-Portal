@@ -76,90 +76,13 @@ const Profile = () => {
   ];
 
   return (
-    <div className="author" style={{ display: 'flex', flexDirection: 'column' }}>
-      <div className='charts' style={{ display: 'flex' }}>
-        <div>
-          <PieChart
-            series={[
-              {
-                data: [
-                  { id: 0, value: 30, label: 'Telecommunication' },
-                  { id: 1, value: 25, label: 'Computer Networks' },
-                  { id: 2, value: 20, label: 'Algorithms' },
-                  { id: 3, value: 15, label: 'Artificial Intelligence' },
-                  { id: 4, value: 10, label: 'Internet of Things' },
-                ],
-              },
-            ]}
-            width={500}
-            height={200}
-          />
-        </div>
-        <div className='chart'>
-          <LineChart
-            xAxis={[
-              {
-                id: 'Years',
-                data: years,
-                scaleType: 'time',
-                valueFormatter: (date) => date.getFullYear().toString(),
-              },
-            ]}
-            series={[
-              {
-                id: 'Cmpe',
-                label: 'Citations',
-                data: citations,
-                stack: 'total',
-                area: false,
-                showMark: false,
-              },
-            ]}
-            width={400}
-            height={200}
-          />
-        </div>
-      </div>
-      <div className="content-container" style={{ display: 'flex', flexDirection: 'row', marginTop: '20px' }}>
-        <div className="main-content" style={{ flex: 1 }}>
-        <div className="tabs" style={{ marginTop: '20px' }}>
-        <Tabs
-          tabs={['Scientific Articles', 'Projects']}
-          defaultTab="Scientific Articles"
-          onTabChange={handleTabChange}
-        />
-      </div>
-          {activeTab === 'Scientific Articles' && (
-            <>
-              <ul>
-                {articles.map(article => (
-                  <li key={article.article.articleId}>
-                    <div>
-                      <a href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
-                      <p className="author-info"> {article.authorNames.join(', ')}</p>
-                      <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              {/* Pagination controls */}
-              <div className="pagination-buttons">
-                <button onClick={handlePrevPage} disabled={page === 0} style={{ marginLeft: '60%' }}>
-                  <FontAwesomeIcon icon={faArrowLeft} />
-                </button>
-                <button onClick={handleNextPage} disabled={page === (maxPage - 1)}>
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-        <div className="contact-info" style={{ marginLeft: '20px' }}>
-          <img src={author && `${author.photo}`} alt="Author" className="author-photo" />
-          <h1>{author && `${author.title} ${author.authorName}`}</h1>
-          <div className='department'>{author && author.departmentId.departmentName}</div>
-          <h2 style={{ marginTop: '30px' }}> {'Contact Info'}</h2>
-          <div className='contact-line'>
+    <div className="author" style={{ display: 'flex', flexDirection: 'row' }}>
+      <div className="contact-info" style={{ marginLeft: '20px' }}>
+        <img src={author && `${author.photo}`} alt="Author" className="author-photo" />
+        <h1>{author && `${author.title} ${author.authorName}`}</h1>
+        <div className='department'>{author && author.departmentId.departmentName}</div>
+        <h2 style={{ marginTop: '30px' }}> {'Contact Info'}</h2>
+        <div className='contact-line'>
           <p><FontAwesomeIcon icon={faEnvelope} />  {author && author.email}</p>
           <p><FontAwesomeIcon icon={faPhone} /> {author && author.phone} </p>
           <p style={{ marginTop: '60px' }}> <img src={require("./photos/index.PNG")} alt="Index " className="icon" /> <strong>h-index:</strong> {author && author.hindex}</p>
@@ -184,12 +107,90 @@ const Profile = () => {
               <h3 className="project-count-label"><strong>Research Areas</strong> </h3>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="author-header" style={{ marginLeft: '20px', flex: 2 }}>
+        <div className='charts' style={{ display: 'flex' }}>
+          <div>
+            <PieChart
+              series={[
+                {
+                  data: [
+                    { id: 0, value: 30, label: 'Telecommunication' },
+                    { id: 1, value: 25, label: 'Computer Networks' },
+                    { id: 2, value: 20, label: 'Algorithms' },
+                    { id: 3, value: 15, label: 'Artificial Intelligence' },
+                    { id: 4, value: 10, label: 'Internet of Things' },
+                  ],
+                },
+              ]}
+              width={500}
+              height={200}
+            />
+          </div>
+          <div className='chart'>
+            <LineChart
+              xAxis={[
+                {
+                  id: 'Years',
+                  data: years,
+                  scaleType: 'time',
+                  valueFormatter: (date) => date.getFullYear().toString(),
+                },
+              ]}
+              series={[
+                {
+                  id: 'Cmpe',
+                  label: 'Citations',
+                  data: citations,
+                  stack: 'total',
+                  area: false,
+                  showMark: false,
+                },
+              ]}
+              width={400}
+              height={200}
+            />
+          </div>
+        </div>
+        <div className="content-container" style={{ display: 'flex', flexDirection: 'row', marginTop: '20px' }}>
+          <div className="main-content" style={{ flex: 1 }}>
+            <div className="tabs" style={{ marginTop: '20px' }}>
+              <Tabs
+                tabs={['Scientific Articles', 'Projects']}
+                defaultTab="Scientific Articles"
+                onTabChange={handleTabChange}
+              />
+            </div>
+            {activeTab === 'Scientific Articles' && (
+              <>
+                <ul>
+                  {articles.map(article => (
+                    <li key={article.article.articleId}>
+                      <div>
+                        <a href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
+                        <p className="author-info"> {article.authorNames.join(', ')}</p>
+                        <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                {/* Pagination controls */}
+                <div className="pagination-buttons">
+                  <button onClick={handlePrevPage} disabled={page === 0} style={{ marginLeft: '40%' }}>
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                  </button>
+                  <button onClick={handleNextPage} disabled={page === (maxPage - 1)}>
+                    <FontAwesomeIcon icon={faArrowRight} />
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
-      
     </div>
   );
-};
+};  
 
 export default Profile;
