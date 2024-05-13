@@ -1,0 +1,88 @@
+.header {
+    background-color: #1f357a;
+    display: flex;
+    align-items: center; 
+    height: 30%;
+
+}
+.uniname {
+    color: white;
+    font-family: 'Poppins';
+    font-weight: lighter;
+    flex-grow: 1; 
+    text-align: center;
+}
+
+.unilogo img {
+    height: 5rem; 
+    margin-right: 1.25rem; 
+    border-radius: 50%; 
+}
+.navbar {
+    display: flex;
+}
+
+.nav-box {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #1f357a;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.dropdown-box {
+    position: relative;
+}
+
+.dropdown-name {
+    color: #1f357a; /* Set color for dropdown names */
+    font-weight: bold; /* Make dropdown names bold */
+    margin-bottom: 5px; /* Add some spacing between dropdown name and content */
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%; /* Position the dropdown relative to its parent */
+    transform: translateX(-50%); /* Center the dropdown horizontally */
+    background-color: #fff;
+    min-width: 160px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+.dropdown-box:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a {
+    color: #1f357a;
+    text-decoration: none;
+    text-align: center;
+    opacity: 0.8;
+    border-radius: 10px;
+    background-color: white; 
+    padding: 16px 100px; 
+    font-size: 16px; 
+    position: relative;
+    display: block;
+    white-space: nowrap;
+    
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+
+
+
+.nav-link:hover {
+    opacity: 1;
+}
+
+.nav-link.active {
+    opacity: 1;
+}

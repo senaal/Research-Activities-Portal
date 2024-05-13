@@ -1,4 +1,10 @@
+import React, { useState, useEffect } from 'react';
 import { PieChart, LineChart } from '@mui/x-charts';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Tabs from './Tabs'; 
+import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import HorizontalScroll from './HorizontalScroll';
+
 
 const years = [
   new Date(2012, 0, 1),
@@ -22,9 +28,56 @@ const citations = [
 
 
 function Home() {
+  const [articles, setArticles] = useState([]);
+  const [maxPage, setMaxPage] = useState(0);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+  const [activeTab, setActiveTab] = useState('Scientific Articles'); 
+  const [members, setMembers] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const articlesResponse = await fetch(`http://localhost:8080/article/scientific_articles?page=${page}&size=${size}`);
+        const articlesData = await articlesResponse.json();
+        setArticles(articlesData.content);
+        setMaxPage(articlesData.totalPages);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [page, size]);
+  const fetchDataMembers = async () => {
+    try {
+      // Fetch members data
+      const facultyMembersResponse = await fetch(`http://localhost:8080/facultymember/`);
+      let data = await facultyMembersResponse.json();
+      console.log(data)
+      setMembers(data);
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  fetchDataMembers();
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+  const handleNextPage = () => {
+    setPage(page + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (page > 0) {
+      setPage(page - 1);
+    }
+  };
   return (
     <div className="App">
-      <h1>BOGAZICI UNIVERSITY</h1>
+      <h1 style={{ marginLeft: '1.5%', color: '#1f357a', fontFamily: 'Inria Sans, serif', fontSize:'50px' }}>BOGAZICI UNIVERSITY</h1>
       <div className='charts'>
         <div>
         <LineChart
@@ -93,8 +146,53 @@ function Home() {
             height={400}
           />
         </div>
-    </div>
-    </div>
+        <div className="tabs" style={{ marginTop: '20px' }}>
+        </div>
+        </div>
+
+        <Tabs
+          tabs={['Scientific Articles', 'Projects', 'Faculty Members']}
+          defaultTab="Scientific Articles"
+          onTabChange={handleTabChange}
+        />
+          {activeTab === 'Scientific Articles' && (
+            <>
+              <ul>
+                {articles.map(article => (
+                  <li key={article.article.articleId}>
+                    <div>
+                      <a href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
+                      <p className="author-info"> {article.authorNames.join(', ')}</p>
+                      <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              {/* Pagination controls */}
+              <div className="pagination-buttons">
+                <button onClick={handlePrevPage} disabled={page === 0} style={{ marginLeft: '50%' }}>
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
+                <button onClick={handleNextPage} disabled={page === (maxPage - 1)}>
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </button>
+              </div>
+            </>
+          )}
+          {activeTab === 'Faculty Members' && (
+              <div>
+                {members.map(department => (
+                <div key={department.department.departmentId}>
+                  <div className='department'>
+                    <h1>{department.department.departmentName}</h1>
+                    <HorizontalScroll items={department.members} /> {}
+                  </div>  
+                </div>
+              ))}
+              </div>
+            )}
+        </div>
+        
 
   );
 }
