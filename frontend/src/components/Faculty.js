@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Tabs from './Tabs'; 
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HorizontalScroll from './HorizontalScroll';
-
+import { useParams } from 'react-router-dom'; // Import useParams to get parameters from URL
 
 const years = [
   new Date(2014, 0, 1),
@@ -25,14 +25,16 @@ const citations = [
 ];
 
 
-function Home() {
-  const [articles, setArticles] = useState([]);
-  const [maxPage, setMaxPage] = useState(0);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
-  const [activeTab, setActiveTab] = useState('Scientific Articles'); 
-  const [members, setMembers] = useState([]);
-
+const Faculty = () => {
+    const [articles, setArticles] = useState([]);
+    const [maxPage, setMaxPage] = useState(0);
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10);
+    const [activeTab, setActiveTab] = useState('Scientific Articles'); 
+    const [members, setMembers] = useState([]);
+    const [name, setName] = useState("");
+    const { id } = useParams(); 
+    
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,18 +44,33 @@ function Home() {
         setArticles(articlesData.content);
         setMaxPage(articlesData.totalPages);
 
-        const facultyMembersResponse = await fetch(`http://localhost:8080/facultymember/`);
-        let data = await facultyMembersResponse.json();
-        console.log(data)
-        setMembers(data);
-
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
-  }, [page, size]);
+  }, [id, page, size]);
+
+  useEffect(() => {
+    const fetchDataMembers = async () => {
+      try {
+        const facultyMembersResponse = await fetch(`http://localhost:8080/facultymember/`);
+        let data = await facultyMembersResponse.json();
+        const filteredMembers = data.filter(member => member.department.facultyId.facultyId === parseInt(id));
+        setMembers(filteredMembers);
+        console.log(filteredMembers[0])
+        setName(filteredMembers[0].department.facultyId.facultyName);
+        
+     
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchDataMembers();
+  }, [id]); 
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -68,33 +85,13 @@ function Home() {
     }
   };
   return (
-    <div className="App">
-      <h1 style={{ marginLeft: '1.5%', color: '#1f357a', fontFamily: 'Inria Sans, serif', fontSize:'50px' }}>BOGAZICI UNIVERSITY</h1>
-      <div className='charts'>
-        <div>
-        <LineChart
-            xAxis={[
-              {
-                id: 'Years',
-                data: years,
-                scaleType: 'time',
-                valueFormatter: (date) => date.getFullYear().toString(),
-              },
-            ]}
-            series={[
-              {
-                id: 'Cmpe',
-                label: 'Scientific Article Count',
-                data: citations,
-                stack: 'total',
-                area: false,
-                showMark: false,
-              },
-            ]}
-            width={500}
-            height={400}
-          />
+    <div>
+      <div className='department-page'>
+        <div className='department-header'>
+          <h1>{name}</h1>
         </div>
+      </div>
+      <div className='charts'>
         <div>
           <PieChart
             series={[
@@ -110,7 +107,7 @@ function Home() {
                 faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
               },
             ]}
-            width={500}
+            width={700}
             height={400}
           />
         </div>
@@ -134,12 +131,13 @@ function Home() {
                 showMark: false,
               },
             ]}
-            width={500}
+            width={700}
             height={400}
           />
         </div>
+      </div>
+      
         <div className="tabs" style={{ marginTop: '20px' }}>
-        </div>
         </div>
 
         <Tabs
@@ -184,9 +182,7 @@ function Home() {
               </div>
             )}
         </div>
-        
-
   );
 }
 
-export default Home;
+export default Faculty;

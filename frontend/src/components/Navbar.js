@@ -34,12 +34,17 @@ function Navbar() {
   const [showFacultyDropdown, setShowFacultyDropdown] = useState(false);
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
   const [departments, setDepartments] = useState([]);
+  const [faculties, setFaculties] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
-      try {;
+      try {
         const departmentsResponse = await fetch('http://localhost:8080/department/');
         const departmentsData = await departmentsResponse.json();
         setDepartments(departmentsData);
+
+        const facultyResponse = await fetch('http://localhost:8080/faculty/');
+        const facultiesData = await facultyResponse.json();
+        setFaculties(facultiesData);
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -47,7 +52,7 @@ function Navbar() {
     };
 
     fetchData();
-  },);
+  },[]);
 
   return (
     <div>
@@ -67,10 +72,18 @@ function Navbar() {
           <div className="dropdown-box" onMouseEnter={() => setShowFacultyDropdown(true)} onMouseLeave={() => setShowFacultyDropdown(false)}>
             <span className="dropdown-name">Faculties</span> 
             {showFacultyDropdown && (
-              <div className="dropdown-content faculty-dropdown">
-                <Link to="/faculty1" className='nav-link' key="faculty1">Faculty 1</Link>
-                <Link to="/faculty2" className='nav-link' key="faculty2">Faculty 2</Link>
-              </div>
+              <div className="dropdown-content department-dropdown">
+              {faculties.map(faculty => (
+                <Link
+                  to={`/faculty/${faculty.facultyId}`}
+                  className='nav-link'
+                  key={faculty.facultyId}
+                  onClick={() => setShowDepartmentDropdown(false)} 
+                >
+                  {faculty.facultyName}
+                </Link>
+              ))}
+            </div>
             )}
           </div>
         </div>
