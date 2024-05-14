@@ -28,9 +28,25 @@ public class FacultyMemberLogs {
     @Column
     private Date date;
 
+    @Column
+    private int oldValue;
+
+    @Column
+    private int newValue;
+
+
+
     public FacultyMemberLogs(FacultyMember facultyMember, String log) {
         this.authorId = facultyMember;
         this.log = log;
         this.date = new Date();
+    }
+
+    public FacultyMemberLogs(FacultyMember facultyMember, String log, int oldValue, int newValue) {
+        this.authorId = facultyMember;
+        this.log = log;
+        this.date = new Date();
+        this.oldValue = oldValue;
+        this.newValue = newValue;
     }
 }

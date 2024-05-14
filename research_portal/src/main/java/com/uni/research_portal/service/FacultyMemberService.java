@@ -15,6 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -55,9 +56,26 @@ public class FacultyMemberService {
             try {
                 JsonNode jsonNode = objectMapper.readTree(responseBody);
                 if (jsonNode != null) {
-                    facultyMember.setCitedByCount(jsonNode.get("cited_by_count").asInt());
-                    facultyMember.setHIndex(jsonNode.get("summary_stats").get("h_index").asInt());
-                    facultyMember.setI10Index(jsonNode.get("summary_stats").get("i10_index").asInt());
+                    int citedByCount = jsonNode.get("cited_by_count").asInt();
+                    if(facultyMember.getCitedByCount() != citedByCount){
+                        FacultyMemberLogs facultyMemberLogs = new FacultyMemberLogs(facultyMember, "updated cited by count", facultyMember.getCitedByCount(), citedByCount);
+
+                        facultyMember.setCitedByCount(citedByCount);
+                        facultyMemberLogsRepository.save(facultyMemberLogs);
+                    }
+                    int hIndex = jsonNode.get("summary_stats").get("h_index").asInt();
+                    if(facultyMember.getHIndex() != hIndex){
+                        FacultyMemberLogs facultyMemberLogs = new FacultyMemberLogs(facultyMember, "updated h-index", facultyMember.getHIndex(), hIndex);
+                        facultyMember.setHIndex(hIndex);
+                        facultyMemberLogsRepository.save(facultyMemberLogs);
+                    }
+                    int i10 = jsonNode.get("summary_stats").get("i10_index").asInt();
+                    if(facultyMember.getI10Index() != i10){
+                        FacultyMemberLogs facultyMemberLogs = new FacultyMemberLogs(facultyMember, "updated i10-index", facultyMember.getI10Index(), i10);
+                        facultyMember.setI10Index(i10);
+                        facultyMemberLogsRepository.save(facultyMemberLogs);
+
+                    }
                     facultyMemberRepository.save(facultyMember);
                 }
             } catch (Exception ignored) {}
@@ -68,6 +86,7 @@ public class FacultyMemberService {
         }
     }
 
+    @Scheduled(cron = "0 0 3 * * *", zone = "GMT+3")
     public ResponseEntity<String> syncFacultyMembers() {
         try{
             List<FacultyMember> members = facultyMemberRepository.findByIsDeletedFalse();
