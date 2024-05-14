@@ -11,23 +11,16 @@
     margin: 5px;
   }
   
-  button {
+  .admin button {
     margin-bottom: 10px;
   }
   
-  ul {
+  .admin ul {
     list-style-type: none;
-    padding: 0;
+    padding: 0
   }
   
-  li {
-    margin-bottom: 5px;
-    padding: 5px;
-    background-color: #f0f0f0;
-    border-radius: 3px;
-  }
-
-  p{
+  .admin p{
     font-size: 14px;
     margin: 0px;
   }

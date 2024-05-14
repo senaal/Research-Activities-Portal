@@ -7,8 +7,6 @@ import HorizontalScroll from './HorizontalScroll';
 
 
 const years = [
-  new Date(2012, 0, 1),
-  new Date(2013, 0, 1),
   new Date(2014, 0, 1),
   new Date(2015, 0, 1),
   new Date(2016, 0, 1),
@@ -22,7 +20,7 @@ const years = [
   new Date(2024, 0, 1),
 ];
 const citations = [
-  3549, 3616, 6845, 7613, 4553, 6727, 3669, 3657,
+  6845, 7613, 4553, 6727, 3669, 3657,
   5663, 6527, 6827, 7124, 918,
 ];
 
@@ -35,6 +33,7 @@ function Home() {
   const [activeTab, setActiveTab] = useState('Scientific Articles'); 
   const [members, setMembers] = useState([]);
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -42,6 +41,7 @@ function Home() {
         const articlesData = await articlesResponse.json();
         setArticles(articlesData.content);
         setMaxPage(articlesData.totalPages);
+
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -170,7 +170,7 @@ function Home() {
               </ul>
               {/* Pagination controls */}
               <div className="pagination-buttons">
-                <button onClick={handlePrevPage} disabled={page === 0} style={{ marginLeft: '50%' }}>
+                <button onClick={handlePrevPage} disabled={page === 0} style={{ marginLeft: '45%' }}>
                   <FontAwesomeIcon icon={faArrowLeft} />
                 </button>
                 <button onClick={handleNextPage} disabled={page === (maxPage - 1)}>

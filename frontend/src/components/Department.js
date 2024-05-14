@@ -1,35 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaSearch } from 'react-icons/fa'; 
 import './department.css';
 import { PieChart, LineChart } from '@mui/x-charts';
-
-const SearchBar = ({ onSearch }) => {
-  const [query, setQuery] = useState('');
-
-  const handleChange = (event) => {
-    setQuery(event.target.value);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    onSearch(query);
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className='input'>
-      <input
-        className='text'
-        placeholder='Search'
-        value={query}
-        onChange={handleChange}
-      />
-      <button className='submit'>
-        <FaSearch />
-      </button>
-    </form>
-  );
-};
 
 const years = [
   new Date(2012, 0, 1),
@@ -54,7 +26,6 @@ const citations = [
 
 const Department = ({ departments }) => {
   const { id } = useParams();
-  const [searchResults, setSearchResults] = useState([]);
   const [articles, setArticles] = useState([]);
   const [departmentName, setDepartmentName] = useState('');
 
@@ -66,18 +37,14 @@ const Department = ({ departments }) => {
         setDepartmentName(data[0].department.departmentName);
       })
       .catch(error => console.error('Error fetching articles:', error));
-  }, []);
+  }, [id]);
 
-  const handleSearch = (query) => {
-    console.log("Searching for:", query);
-  };
 
   return (
     <div>
       <div className='department-page'>
         <div className='department-header'>
           <h1>{departmentName}</h1>
-          <SearchBar onSearch={handleSearch} />
         </div>
       </div>
       <div className='charts'>
