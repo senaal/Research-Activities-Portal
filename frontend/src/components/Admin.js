@@ -4,8 +4,6 @@ import Modal from './Modal';
 import Tabs from './Tabs'; 
 import Confirm from './Confirm';
 
-
-
 const Admin = () => {
   const [departmentName, setDepartmentName] = useState('');
   const [facultyId, setFacultyId] = useState('');
@@ -35,7 +33,8 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState('Create Faculty'); 
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
-
+  const [syncArticlesLoading, setSyncArticlesLoading] = useState(false);
+  const [syncMembersLoading, setSyncMembersLoading] = useState(false);
 
   useEffect(() => {
     fetchFaculties();
@@ -211,12 +210,12 @@ const Admin = () => {
         setPopupMessage('Member updated successfully!');
       } else {
         console.error('Failed to update member data');
-        setPopupMessage('Error occured!');
+        setPopupMessage('Error occurred!');
 
       }
     })
     .catch(error => console.error('Error updating member data:', error));
-    setPopupMessage('Error occured!');
+    setPopupMessage('Error occurred!');
   };
 
   const handleDeleteFacultySubmit = () => {
@@ -231,14 +230,14 @@ const Admin = () => {
         setPopupMessage('Faculty is deleted!');
       } else {
         console.error('Failed to delete faculty');
-        setPopupMessage('Error occured!');
+        setPopupMessage('Error occurred!');
 
       }
       fetchFaculties();
 
     })
     .catch(error => console.error('Error deleting faculty', error));
-    setPopupMessage('Error occured!');
+    setPopupMessage('Error occurred!');
   };
 
   const handleDeleteDepartmentSubmit = () => {
@@ -253,14 +252,14 @@ const Admin = () => {
         setPopupMessage('Department is deleted!');
       } else {
         console.error('Failed to delete department');
-        setPopupMessage('Error occured!');
+        setPopupMessage('Error occurred!');
 
       }
       fetchFaculties();
 
     })
     .catch(error => console.error('Error deleting department', error));
-    setPopupMessage('Error occured!');
+    setPopupMessage('Error occurred!');
   };
 
   const handleDeleteConfirmation = (facultyId) => {
@@ -281,6 +280,57 @@ const Admin = () => {
       setShowConfirmation(false); 
     }
   };
+
+  const handleTriggerArticlesSubmit = () => {
+    setSyncArticlesLoading(true); // Set loading to true when the action is triggered
+    fetch(`http://localhost:8080/article/sync`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => {
+      setSyncArticlesLoading(false); // Set loading to false when the response is received
+      if (response.ok) {
+        setPopupMessage('Articles are synchronized!');
+      } else {
+        console.error('Failed to sync articles');
+        setPopupMessage('Error occurred!');
+      }
+      fetchFaculties();
+    })
+    .catch(error => {
+      console.error('Error syncing articles', error);
+      setPopupMessage('Error occurred!');
+      setSyncArticlesLoading(false); // Set loading to false when an error occurs
+    });
+  };
+
+  const handleTriggerFacultyMembersSubmit = () => {
+    setSyncMembersLoading(true); // Set loading to true when the action is triggered
+    fetch(`http://localhost:8080/facultymember/sync`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => {
+      setSyncMembersLoading(false); // Set loading to false when the response is received
+      if (response.ok) {
+        setPopupMessage('Faculty members are synchronized!');
+      } else {
+        console.error('Failed to sync members');
+        setPopupMessage('Error occurred!');
+      }
+      fetchFaculties();
+    })
+    .catch(error => {
+      console.error('Error syncing members', error);
+      setPopupMessage('Error occurred!');
+      setSyncMembersLoading(false); // Set loading to false when an error occurs
+    });
+  };
+
   const closePopup = () => {
     setPopupMessage('');
   };
@@ -294,198 +344,206 @@ const Admin = () => {
       {popupMessage && <Modal message={popupMessage} onClose={closePopup} />}
       <div className="tabs" style={{ marginTop: '20px' }}>
         <Tabs
-          tabs={['Create Faculty', 'Create Department', 'Create Faculty Member', 'Edit Faculty Member', 'Delete Faculty', 'Delete Department']}
+          tabs={['Create Faculty', 'Create Department', 'Create Faculty Member', 'Edit Faculty Member', 'Delete Faculty', 'Delete Department', 'Sync Articles & Faculty Members']}
           defaultTab="Create Faculty"
           onTabChange={handleTabChange}
         />
       </div>
       {activeTab === 'Create Department' && (
         <>
-      <div className="section">
-        <h2>Create Department</h2>
-        <select value={facultyId} onChange={(e) => setFacultyId(e.target.value)}>
-          <option value="">Select Faculty of Department</option>
-          {faculties.map((faculty) => (
-            <option key={faculty.facultyId} value={faculty.facultyId}>
-              {faculty.facultyName}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          value={departmentName}
-          onChange={(e) => setDepartmentName(e.target.value)}
-          placeholder="Enter department name"
-        />
-        
-        <button onClick={handleDepartmentSubmit}>Create Department</button>
-        
-      </div>
-      </>
-    )}
-    {activeTab === 'Create Faculty' && (
-            <>
-      <div className="section">
-        <h2>Create Faculty</h2>
-        <input
-          type="text"
-          value={facultyName}
-          onChange={(e) => setFacultyName(e.target.value)}
-          placeholder="Enter faculty name"
-        />
-        <button onClick={handleFacultySubmit}>Add Faculty</button>
-        
-      </div>
-      </>
-    )}
-    {activeTab === 'Create Faculty Member' && (
-            <>
-      <div className="section">
-        <h2>Create Faculty Member</h2>
-        <select value={newdepartmentId} onChange={(e) => setnewDepartmentId(e.target.value)}>
-          <option value="">Select Department of Member</option>
-          {departments.map((department) => (
-            <option key={department.departmentId} value={department.departmentId}>
-              {department.departmentName}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          value={newauthorName}
-          onChange={(e) => setnewAuthorName(e.target.value)}
-          placeholder="Enter author name"
-        />
-        <input
-          type="text"
-          value={newopenAlexId}
-          onChange={(e) => setnewOpenAlexId(e.target.value)}
-          placeholder="Enter openAlexId"
-        />
-        <input
-          type="number"
-          value={newsemanticId}
-          onChange={(e) => setnewSemanticId(e.target.value)}
-          placeholder="Enter semanticId"
-        />
-        <input
-          type="text"
-          value={newemail}
-          onChange={(e) => setnewEmail(e.target.value)}
-          placeholder="Enter email"
-        />
-        <input
-          type="text"
-          value={newphone}
-          onChange={(e) => setnewPhone(e.target.value)}
-          placeholder="Enter phone"
-        />
-        <input
-          type="text"
-          value={newphoto}
-          onChange={(e) => setnewPhoto(e.target.value)}
-          placeholder="Enter photo"
-        />
-        <input
-          type="text"
-          value={newtitle}
-          onChange={(e) => setnewTitle(e.target.value)}
-          placeholder="Enter title"
-        />
-        <button onClick={handleFacultyMemberSubmit}>Add Faculty Member</button>
-      </div>
-      </>
-    )}
-    {activeTab === 'Edit Faculty Member' && (
-            <>
-      <div className="section">
-      <h2>Edit Faculty Member</h2>
-      <select value={authorId} onChange={handleMemberSelect}>
-        <option value="">Select Member</option>
-        {members.map((member) => (
-          <option key={member.authorId} value={member.authorId}>
-            {member.authorName}
-          </option>
-        ))}
-      </select>
-      <p> Email</p>
-      <input
-        type="text"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Enter email"
-        title="Email"
-      />
-      <p> Phone</p>
-      <input
-        type="text"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        placeholder="Enter phone"
-        title="Phone"
-      />
-      <p> Photo</p>
-      <input
-        type="text"
-        value={photo}
-        onChange={(e) => setPhoto(e.target.value)}
-        placeholder="Enter photo"
-        title="Photo"
-      />
-      <p> Title</p>
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Enter title"
-        title="Title"
-      />
-      <button onClick={handleEditFacultyMemberSubmit}>Submit</button>
-      </div>
-      </>
-    )}
-    {activeTab === 'Delete Faculty' && (
-            <>
-      <div className="section">
-        <h2>Delete Faculty</h2>
-        <select value={deletedFacultyId} onChange={(e) => setDeletedFacultyId(e.target.value)}>
-          <option value="">Select Faculty</option>
-          {faculties.map((faculty) => (
-            <option key={faculty.facultyId} value={faculty.facultyId}>
-              {faculty.facultyName}
-            </option>
-          ))}
-        </select>
-        <button onClick={() => handleDeleteConfirmation(deletedFacultyId)}>Delete Faculty</button>
-        
-      </div>
-      {showConfirmation && (
-        <Confirm message="Are you sure? Faculty and related departments will be deleted." onClose={() => setShowConfirmation(false)} onConfirm={handleConfirmationAction}>
-        </Confirm>
+          <div className="section">
+            <h2>Create Department</h2>
+            <select value={facultyId} onChange={(e) => setFacultyId(e.target.value)}>
+              <option value="">Select Faculty of Department</option>
+              {faculties.map((faculty) => (
+                <option key={faculty.facultyId} value={faculty.facultyId}>
+                  {faculty.facultyName}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              value={departmentName}
+              onChange={(e) => setDepartmentName(e.target.value)}
+              placeholder="Enter department name"
+            />
+            
+            <button onClick={handleDepartmentSubmit}>Create Department</button>
+            
+          </div>
+        </>
       )}
-      </>
-    )}
-    {activeTab === 'Delete Department' && (
-            <>
-      <div className="section">
-        <h2>Delete Department</h2>
-        <select value={deletedDepartmentId} onChange={(e) => setDeletedDepartmentId(e.target.value)}>
-          <option value="">Select Department</option>
-          {departments.map((department) => (
-            <option key={department.departmentId} value={department.departmentId}>
-              {department.departmentName}
-            </option>
-          ))}
-        </select>
-        <button onClick={() => handleDeleteDepartmentConfirmation(deletedDepartmentId)}>Delete Department</button>
-        
-      </div>
-      {showConfirmation && (
-        <Confirm message="Are you sure? Department will be deleted." onClose={() => setShowConfirmation(false)} onConfirm={handleConfirmationAction}>
-        </Confirm>
+      {activeTab === 'Create Faculty' && (
+        <>
+          <div className="section">
+            <h2>Create Faculty</h2>
+            <input
+              type="text"
+              value={facultyName}
+              onChange={(e) => setFacultyName(e.target.value)}
+              placeholder="Enter faculty name"
+            />
+            <button onClick={handleFacultySubmit}>Add Faculty</button>
+          </div>
+        </>
       )}
-      </>
-    )}
+      {activeTab === 'Create Faculty Member' && (
+        <>
+          <div className="section">
+            <h2>Create Faculty Member</h2>
+            <select value={newdepartmentId} onChange={(e) => setnewDepartmentId(e.target.value)}>
+              <option value="">Select Department of Member</option>
+              {departments.map((department) => (
+                <option key={department.departmentId} value={department.departmentId}>
+                  {department.departmentName}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              value={newauthorName}
+              onChange={(e) => setnewAuthorName(e.target.value)}
+              placeholder="Enter author name"
+            />
+            <input
+              type="text"
+              value={newopenAlexId}
+              onChange={(e) => setnewOpenAlexId(e.target.value)}
+              placeholder="Enter openAlexId"
+            />
+            <input
+              type="number"
+              value={newsemanticId}
+              onChange={(e) => setnewSemanticId(e.target.value)}
+              placeholder="Enter semanticId"
+            />
+            <input
+              type="text"
+              value={newemail}
+              onChange={(e) => setnewEmail(e.target.value)}
+              placeholder="Enter email"
+            />
+            <input
+              type="text"
+              value={newphone}
+              onChange={(e) => setnewPhone(e.target.value)}
+              placeholder="Enter phone"
+            />
+            <input
+              type="text"
+              value={newphoto}
+              onChange={(e) => setnewPhoto(e.target.value)}
+              placeholder="Enter photo"
+            />
+            <input
+              type="text"
+              value={newtitle}
+              onChange={(e) => setnewTitle(e.target.value)}
+              placeholder="Enter title"
+            />
+            <button onClick={handleFacultyMemberSubmit}>Add Faculty Member</button>
+          </div>
+        </>
+      )}
+      {activeTab === 'Edit Faculty Member' && (
+        <>
+          <div className="section">
+            <h2>Edit Faculty Member</h2>
+            <select value={authorId} onChange={handleMemberSelect}>
+              <option value="">Select Member</option>
+              {members.map((member) => (
+                <option key={member.authorId} value={member.authorId}>
+                  {member.authorName}
+                </option>
+              ))}
+            </select>
+            <p> Email</p>
+            <input
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter email"
+              title="Email"
+            />
+            <p> Phone</p>
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Enter phone"
+              title="Phone"
+            />
+            <p> Photo</p>
+            <input
+              type="text"
+              value={photo}
+              onChange={(e) => setPhoto(e.target.value)}
+              placeholder="Enter photo"
+              title="Photo"
+            />
+            <p> Title</p>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter title"
+              title="Title"
+            />
+            <button onClick={handleEditFacultyMemberSubmit}>Submit</button>
+          </div>
+        </>
+      )}
+      {activeTab === 'Delete Faculty' && (
+        <>
+          <div className="section">
+            <h2>Delete Faculty</h2>
+            <select value={deletedFacultyId} onChange={(e) => setDeletedFacultyId(e.target.value)}>
+              <option value="">Select Faculty</option>
+              {faculties.map((faculty) => (
+                <option key={faculty.facultyId} value={faculty.facultyId}>
+                  {faculty.facultyName}
+                </option>
+              ))}
+            </select>
+            <button onClick={() => handleDeleteConfirmation(deletedFacultyId)}>Delete Faculty</button>
+            
+          </div>
+          {showConfirmation && (
+            <Confirm message="Are you sure? Faculty and related departments will be deleted." onClose={() => setShowConfirmation(false)} onConfirm={handleConfirmationAction}>
+            </Confirm>
+          )}
+        </>
+      )}
+      {activeTab === 'Delete Department' && (
+        <>
+          <div className="section">
+            <h2>Delete Department</h2>
+            <select value={deletedDepartmentId} onChange={(e) => setDeletedDepartmentId(e.target.value)}>
+              <option value="">Select Department</option>
+              {departments.map((department) => (
+                <option key={department.departmentId} value={department.departmentId}>
+                  {department.departmentName}
+                </option>
+              ))}
+            </select>
+            <button onClick={() => handleDeleteDepartmentConfirmation(deletedDepartmentId)}>Delete Department</button>
+            
+          </div>
+          {showConfirmation && (
+            <Confirm message="Are you sure? Department will be deleted." onClose={() => setShowConfirmation(false)} onConfirm={handleConfirmationAction}>
+            </Confirm>
+          )}
+        </>
+      )}
+      {activeTab === 'Sync Articles & Faculty Members' && (
+        <>
+          <div className="section">
+            <h2>Sync Articles & Faculty Members</h2>
+            <button className=  "sync-button" onClick={handleTriggerArticlesSubmit}>{syncArticlesLoading ? 'Syncing...' : 'Sync Articles'}</button>
+            <button className=  "sync-button" onClick={handleTriggerFacultyMembersSubmit}>{syncMembersLoading ? 'Syncing...' : 'Sync Faculty Members'}</button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
