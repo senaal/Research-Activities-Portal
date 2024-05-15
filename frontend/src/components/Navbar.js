@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa'; 
 import logo from './photos/photo.jpeg';
@@ -33,6 +33,26 @@ const SearchBar = ({ onSearch }) => {
 function Navbar() {
   const [showFacultyDropdown, setShowFacultyDropdown] = useState(false);
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [faculties, setFaculties] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const departmentsResponse = await fetch('http://localhost:8080/department/');
+        const departmentsData = await departmentsResponse.json();
+        setDepartments(departmentsData);
+
+        const facultyResponse = await fetch('http://localhost:8080/faculty/');
+        const facultiesData = await facultyResponse.json();
+        setFaculties(facultiesData);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  },[]);
 
   return (
     <div>
@@ -52,25 +72,45 @@ function Navbar() {
           <div className="dropdown-box" onMouseEnter={() => setShowFacultyDropdown(true)} onMouseLeave={() => setShowFacultyDropdown(false)}>
             <span className="dropdown-name">Faculties</span> 
             {showFacultyDropdown && (
-              <div className="dropdown-content faculty-dropdown">
-                <Link to="/faculty1" className='nav-link' key="faculty1">Faculty 1</Link>
-                <Link to="/faculty2" className='nav-link' key="faculty2">Faculty 2</Link>
-              </div>
+              <div className="dropdown-content department-dropdown">
+              {faculties.map(faculty => (
+                <Link
+                  to={`/faculty/${faculty.facultyId}`}
+                  className='nav-link'
+                  key={faculty.facultyId}
+                  onClick={() => setShowDepartmentDropdown(false)} 
+                >
+                  {faculty.facultyName}
+                </Link>
+              ))}
+            </div>
             )}
           </div>
         </div>
 
         <div className='nav-box'>
-          <div className="dropdown-box" onMouseEnter={() => setShowDepartmentDropdown(true)} onMouseLeave={() => setShowDepartmentDropdown(false)}>
-            <span className="dropdown-name">Departments</span> 
-            {showDepartmentDropdown && (
-              <div className="dropdown-content department-dropdown">
-                <Link to="/department/1" className='nav-link' key="department1">Computer Engineering</Link>
-                <Link to="/department/2" className='nav-link' key="department2">Department 2</Link>
-              </div>
-            )}
-          </div>
+      <div
+        className="dropdown-box"
+        onMouseEnter={() => setShowDepartmentDropdown(true)}
+        onMouseLeave={() => setShowDepartmentDropdown(false)}
+      >
+          <span className="dropdown-name">Departments</span>
+          {showDepartmentDropdown && (
+            <div className="dropdown-content department-dropdown">
+              {departments.map(department => (
+                <Link
+                  to={`/department/${department.departmentId}`}
+                  className='nav-link'
+                  key={department.departmentId}
+                  onClick={() => setShowDepartmentDropdown(false)} 
+                >
+                  {department.departmentName}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
+      </div>
 
         <div className='nav-box'>
           <SearchBar />
