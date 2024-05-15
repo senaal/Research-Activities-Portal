@@ -39,7 +39,7 @@ const Faculty = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const articlesResponse = await fetch(`http://localhost:8080/article/scientific_articles?page=${page}&size=${size}`);
+        const articlesResponse = await fetch(`http://localhost:8080/article/faculty/${id}?page=${page}&size=${size}`);
         const articlesData = await articlesResponse.json();
         setArticles(articlesData.content);
         setMaxPage(articlesData.totalPages);
@@ -59,7 +59,6 @@ const Faculty = () => {
         let data = await facultyMembersResponse.json();
         const filteredMembers = data.filter(member => member.department.facultyId.facultyId === parseInt(id));
         setMembers(filteredMembers);
-        console.log(filteredMembers[0])
         setName(filteredMembers[0].department.facultyId.facultyName);
         
      
@@ -149,13 +148,15 @@ const Faculty = () => {
             <>
               <ul>
                 {articles.map(article => (
-                  <li key={article.article.articleId}>
-                    <div>
-                      <a href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
-                      <p className="author-info"> {article.authorNames.join(', ')}</p>
-                      <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
-                    </div>
-                  </li>
+                  article && article.article ? (
+                    <li key={article.article.articleId}>
+                      <div>
+                        <a href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
+                        <p className="author-info"> {article.authorNames.join(', ')}</p>
+                        <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
+                      </div>
+                    </li>
+                  ) : null
                 ))}
               </ul>
               {/* Pagination controls */}
