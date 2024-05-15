@@ -12,4 +12,7 @@ public interface ArticleAuthorRepository extends JpaRepository<ArticleAuthor, In
     Page<ArticleAuthor> findByAuthorId(int id,  Pageable page);
     int countByAuthorId(int id);
     List<ArticleAuthor> findByScientificArticle(ScientificArticle article);
+
+    Page<ArticleAuthor> findByIsFacultyMemberTrueAndAuthorIdIn(List<Integer> authorIds, Pageable pageable);
+
 }

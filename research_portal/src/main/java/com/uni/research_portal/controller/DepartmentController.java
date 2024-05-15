@@ -33,5 +33,4 @@ public class DepartmentController {
         return departmentService.getDepartments();
     }
 
-
 }
