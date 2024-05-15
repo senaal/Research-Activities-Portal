@@ -2,9 +2,9 @@ package com.uni.research_portal.repository;
 
 import com.uni.research_portal.dto.DepartmentArticlesDto;
 import com.uni.research_portal.dto.ExternalFacultyMemberDto;
-import com.uni.research_portal.model.Department;
-import com.uni.research_portal.model.FacultyMember;
+import com.uni.research_portal.model.ArticleAuthor;
 import com.uni.research_portal.model.ScientificArticle;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -33,5 +33,8 @@ public interface ScientificArticleRepository extends JpaRepository<ScientificArt
             "JOIN ExternalFacultyMember efm ON aa.authorId = efm.externalAuthorId " +
             "GROUP BY sa.articleId")
     List<ExternalFacultyMemberDto> findArticlesWithAuthors();
+
+    //@Query("SELECT DISTINCT sa FROM ScientificArticle sa JOIN sa.articleAuthors aa WHERE aa.authorId IN :authorIds")
+    //Page<ScientificArticle> findByAuthorIds(List<Integer> authorIds, Pageable pageable);
 }
 
