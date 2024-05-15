@@ -11,16 +11,17 @@ import java.util.Date;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "faculty_member_logs")
-public class FacultyMemberLogs {
+@Table(name = "scientific_article_logs")
+public class ScientificArticleLogs {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "log_id")
     private Integer logId;
 
     @ManyToOne
-    @JoinColumn(name = "author_id", referencedColumnName = "author_id")
-    private FacultyMember authorId;
+    @JoinColumn(name = "article_id", referencedColumnName = "article_id")
+    private ScientificArticle articleId;
 
     @Column(nullable = false)
     private String log;
@@ -34,19 +35,18 @@ public class FacultyMemberLogs {
     @Column
     private int newValue;
 
-
-
-    public FacultyMemberLogs(FacultyMember facultyMember, String log) {
-        this.authorId = facultyMember;
+    public ScientificArticleLogs(ScientificArticle article, String log) {
+        this.articleId = article;
         this.log = log;
         this.date = new Date();
     }
 
-    public FacultyMemberLogs(FacultyMember facultyMember, String log, int oldValue, int newValue) {
-        this.authorId = facultyMember;
+    public ScientificArticleLogs(ScientificArticle article, String log, int oldValue, int newValue) {
+        this.articleId = article;
         this.log = log;
         this.date = new Date();
         this.oldValue = oldValue;
         this.newValue = newValue;
     }
 }
+

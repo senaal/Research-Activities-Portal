@@ -38,9 +38,16 @@ public class ScientificArticleController {
         int pageSize = size != null ? size : 10;
         return scientificArticleService.getAuthorArticles(id,sortBy,sortOrder,pageNum,pageSize);
     }
-    @GetMapping("/department/{departmentId}")
-    public List<ArticleWithAllAuthors> getArticlesByDepartment(@PathVariable Integer departmentId) {
-        return scientificArticleService.getArticlesByDepartment(departmentId);
+    @GetMapping("/department/{id}")
+    public Page<ArticleWithAuthorsDto> getArticlesByDepartment(@PathVariable int id,
+                                                               @RequestParam(defaultValue = "publicationDate") String sortBy,
+                                                               @RequestParam(defaultValue = "DESC") String sortOrder,
+                                                               @RequestParam(required = false) Integer page,
+                                                               @RequestParam(required = false) Integer size
+    ) {
+        int pageNum = page != null ? page : 0;
+        int pageSize = size != null ? size : 10;
+        return scientificArticleService.getArticlesByDepartment(id,sortBy,sortOrder,pageNum,pageSize);
     }
 
     @GetMapping("/scientific_articles")
@@ -53,5 +60,18 @@ public class ScientificArticleController {
         int pageNum = page != null ? page : 0;
         int pageSize = size != null ? size : 10;
         return scientificArticleService.getScientificArticles(sortBy,sortOrder,pageNum,pageSize);
+    }
+
+    @GetMapping("/faculty/{id}")
+    public Page<ArticleWithAuthorsDto> getFacultyArticles(@PathVariable int id,
+                                                         @RequestParam(defaultValue = "publicationDate") String sortBy,
+                                                         @RequestParam(defaultValue = "DESC") String sortOrder,
+                                                         @RequestParam(required = false) Integer page,
+                                                         @RequestParam(required = false) Integer size
+    ){
+
+        int pageNum = page != null ? page : 0;
+        int pageSize = size != null ? size : 10;
+        return scientificArticleService.getArticlesByFaculty(id,sortBy,sortOrder,pageNum,pageSize);
     }
 }

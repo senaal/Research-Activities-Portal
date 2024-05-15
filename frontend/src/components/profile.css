@@ -65,7 +65,6 @@
     border: 2px solid #000000;
     border-radius: 15px;
     margin: 15px;
-    
     height: 15%;
   }
 
@@ -224,4 +223,8 @@
 .tabs button.active {
   text-decoration: underline; 
   font-weight: bold;
+}
+
+.author-header {
+  width: 80%;
 }
