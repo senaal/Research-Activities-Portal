@@ -12,6 +12,8 @@ const Profile = () => {
   const [maxPage, setMaxPage] = useState(0);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
+  const [sortBy, setSortBy] = useState('publicationDate');
+  const [sortOrder, setSortOrder] = useState('DESC');
   const [activeTab, setActiveTab] = useState('Scientific Articles'); 
 
   const { id } = useParams();
@@ -28,7 +30,7 @@ const Profile = () => {
         setAuthor(authorData);
 
         // Fetch articles data for the author with pagination
-        const articlesResponse = await fetch(`http://localhost:8080/article/author/${id}?page=${page}&size=${size}`);
+        const articlesResponse = await fetch(`http://localhost:8080/article/author/${id}?page=${page}&size=${size}&sortOrder=${sortOrder}&sortBy=${sortBy}`);
         const articlesData = await articlesResponse.json();
         setArticles(articlesData.content);
         setMaxPage(articlesData.totalPages);
@@ -38,7 +40,7 @@ const Profile = () => {
     };
 
     fetchData();
-  }, [id, page, size]);
+  }, [id, page, size, sortBy, sortOrder]);
 
   const handleNextPage = () => {
     setPage(page + 1);
@@ -52,6 +54,14 @@ const Profile = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+  };
+
+  const handleSortByChange = (event) => {
+    setSortBy(event.target.value);
+  };
+  
+  const handleSortOrderChange = (event) => {
+    setSortOrder(event.target.value);
   };
 
   const years = [
@@ -164,6 +174,19 @@ const Profile = () => {
             </div>
             {activeTab === 'Scientific Articles' && (
               <>
+              <div className="sort-options">
+                <label htmlFor="sortBy"></label>
+                <select id="sortBy" value={sortBy} onChange={handleSortByChange}>
+                  <option value="publicationDate">Publication Date</option>
+                  <option value="citationCount">Citation Count</option>
+                </select>
+
+                <label htmlFor="sortOrder"> </label>
+                <select id="sortOrder" value={sortOrder} onChange={handleSortOrderChange}>
+                  <option value="ASC">Ascending</option>
+                  <option value="DESC">Descending</option>
+                </select>
+              </div>
                 <ul>
                   {articles.map(article => (
                     <li key={article.article.articleId}>

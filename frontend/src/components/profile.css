@@ -228,3 +228,20 @@
 .author-header {
   width: 80%;
 }
+
+.sort-options {
+  margin-top: 20px;
+  text-align: left;
+  border-radius: 10px;
+}
+
+.sort-options label {
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.sort-options select {
+  margin-right: 20px;
+  padding: 5px;
+  font-size: 14px;
+}
