@@ -33,13 +33,15 @@ const Faculty = () => {
     const [activeTab, setActiveTab] = useState('Scientific Articles'); 
     const [members, setMembers] = useState([]);
     const [name, setName] = useState("");
+    const [sortBy, setSortBy] = useState('publicationDate');
+    const [sortOrder, setSortOrder] = useState('DESC');
     const { id } = useParams(); 
     
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const articlesResponse = await fetch(`http://localhost:8080/article/faculty/${id}?page=${page}&size=${size}`);
+        const articlesResponse = await fetch(`http://localhost:8080/article/faculty/${id}?page=${page}&size=${size}&sortOrder=${sortOrder}&sortBy=${sortBy}`);
         const articlesData = await articlesResponse.json();
         setArticles(articlesData.content);
         setMaxPage(articlesData.totalPages);
@@ -50,7 +52,7 @@ const Faculty = () => {
     };
 
     fetchData();
-  }, [id, page, size]);
+  }, [id, page, size,sortBy, sortOrder]);
 
   useEffect(() => {
     const fetchDataMembers = async () => {
@@ -146,6 +148,14 @@ const Faculty = () => {
     return pageNumbers;
   };
 
+  const handleSortByChange = (event) => {
+    setSortBy(event.target.value);
+  };
+  
+  const handleSortOrderChange = (event) => {
+    setSortOrder(event.target.value);
+  };
+
   return (
     <div>
       <div className='department-page'>
@@ -209,6 +219,19 @@ const Faculty = () => {
         />
           {activeTab === 'Scientific Articles' && (
             <>
+            <div className="sort-options">
+                <label htmlFor="sortBy"></label>
+                <select id="sortBy" value={sortBy} onChange={handleSortByChange}>
+                  <option value="publicationDate">Publication Date</option>
+                  <option value="citationCount">Citation Count</option>
+                </select>
+
+                <label htmlFor="sortOrder"> </label>
+                <select id="sortOrder" value={sortOrder} onChange={handleSortOrderChange}>
+                  <option value="ASC">Ascending</option>
+                  <option value="DESC">Descending</option>
+                </select>
+              </div>
               <ul>
                 {articles.map(article => (
                   article && article.article ? (
