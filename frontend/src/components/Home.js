@@ -32,12 +32,14 @@ function Home() {
   const [size, setSize] = useState(10);
   const [activeTab, setActiveTab] = useState('Scientific Articles'); 
   const [members, setMembers] = useState([]);
+  const [sortBy, setSortBy] = useState('publicationDate');
+  const [sortOrder, setSortOrder] = useState('DESC');
 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const articlesResponse = await fetch(`http://localhost:8080/article/scientific_articles?page=${page}&size=${size}`);
+        const articlesResponse = await fetch(`http://localhost:8080/article/scientific_articles?page=${page}&size=${size}&sortOrder=${sortOrder}&sortBy=${sortBy}`);
         const articlesData = await articlesResponse.json();
         setArticles(articlesData.content);
         setMaxPage(articlesData.totalPages);
@@ -53,7 +55,7 @@ function Home() {
     };
 
     fetchData();
-  }, [page, size]);
+  }, [page, size,sortBy, sortOrder]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -66,6 +68,13 @@ function Home() {
     if (page > 0) {
       setPage(page - 1);
     }
+  };
+  const handleSortByChange = (event) => {
+    setSortBy(event.target.value);
+  };
+  
+  const handleSortOrderChange = (event) => {
+    setSortOrder(event.target.value);
   };
   return (
     <div className="App">
@@ -149,6 +158,17 @@ function Home() {
         />
           {activeTab === 'Scientific Articles' && (
             <>
+            <div className="sort-options">
+                <select id="sortBy" value={sortBy} onChange={handleSortByChange}>
+                  <option value="publicationDate">Publication Date</option>
+                  <option value="citationCount">Citation Count</option>
+                </select>
+
+                <select id="sortOrder" value={sortOrder} onChange={handleSortOrderChange}>
+                  <option value="ASC">Ascending</option>
+                  <option value="DESC">Descending</option>
+                </select>
+              </div>
               <ul>
                 {articles.map(article => (
                   <li key={article.article.articleId}>
