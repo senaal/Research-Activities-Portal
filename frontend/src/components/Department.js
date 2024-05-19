@@ -77,12 +77,75 @@ const Department = ({ departments }) => {
     }
   };
 
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    if (maxPage <= 5) {
+      for (let i = 0; i < maxPage; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => setPage(i)}
+            className={i === page ? 'active-page' : ''}
+            style={{ margin: '0 5px' }}
+          >
+            {i + 1}
+          </button>
+        );
+      }
+    } else {
+      pageNumbers.push(
+        <button
+          key={0}
+          onClick={() => setPage(0)}
+          className={page === 0 ? 'active-page' : ''}
+          style={{ margin: '0 5px' }}
+        >
+          1
+        </button>
+      );
+
+      if (page > 2) {
+        pageNumbers.push(<span key="left-ellipsis">...</span>);
+      }
+
+      for (let i = Math.max(1, page - 1); i <= Math.min(maxPage - 2, page + 1); i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => setPage(i)}
+            className={i === page ? 'active-page' : ''}
+            style={{ margin: '0 5px' }}
+          >
+            {i + 1}
+          </button>
+        );
+      }
+
+      if (page < maxPage - 3) {
+        pageNumbers.push(<span key="right-ellipsis">...</span>);
+      }
+
+      pageNumbers.push(
+        <button
+          key={maxPage - 1}
+          onClick={() => setPage(maxPage - 1)}
+          className={page === maxPage - 1 ? 'active-page' : ''}
+          style={{ margin: '0 5px' }}
+        >
+          {maxPage}
+        </button>
+      );
+    }
+    return pageNumbers;
+
   const handleSortByChange = (event) => {
     setSortBy(event.target.value);
   };
   
   const handleSortOrderChange = (event) => {
     setSortOrder(event.target.value);
+
   };
   
   return (
@@ -177,6 +240,7 @@ const Department = ({ departments }) => {
                 <button onClick={handlePrevPage} disabled={page === 0} style={{ marginLeft: '45%' }}>
                   <FontAwesomeIcon icon={faArrowLeft} />
                 </button>
+                {renderPageNumbers()}
                 <button onClick={handleNextPage} disabled={page === (maxPage - 1)}>
                   <FontAwesomeIcon icon={faArrowRight} />
                 </button>
