@@ -17,12 +17,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static com.uni.research_portal.util.Jwt.extractSubject;
 
 @Service
 public class FacultyMemberService {
@@ -43,6 +46,9 @@ public class FacultyMemberService {
 
     @Autowired
     FacultyMemberLogsRepository facultyMemberLogsRepository;
+
+    @Autowired
+    AdminRepository adminRepository;
     public void updateMembers(String id) {
         try{
             String url = "https://api.openalex.org/authors/" + id;
@@ -89,14 +95,13 @@ public class FacultyMemberService {
     @Scheduled(cron = "0 0 3 * * *", zone = "GMT+3")
     public ResponseEntity<String> syncFacultyMembers() {
         try{
-            List<FacultyMember> members = facultyMemberRepository.findByIsDeletedFalse();
-            for (FacultyMember member : members) {
-                updateMembers(member.getOpenAlexId());
-            }
-            return new ResponseEntity<>("Synchronization Completed.", HttpStatus.OK);
-        }catch(Exception e){
-            return new ResponseEntity<>("Check the Request.",HttpStatus.BAD_REQUEST);
-
+        List<FacultyMember> members = facultyMemberRepository.findByIsDeletedFalse();
+        for (FacultyMember member : members) {
+            updateMembers(member.getOpenAlexId());
+        }
+        return new ResponseEntity<>("Synchronization Completed.", HttpStatus.OK);
+    }catch(Exception e) {
+            return new ResponseEntity<>("Check the Request.", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -135,47 +140,59 @@ public class FacultyMemberService {
         return members;
     }
 
-    public FacultyMember createFacultyMember(CreateAuthorRequestDto createAuthorRequestDto){
-        Department department = departmentRepository.findByDepartmentId(createAuthorRequestDto.getDepartmentId()).get();
-        FacultyMember newMember = new FacultyMember();
-        newMember.setDepartmentId(department);
-        newMember.setAuthorName(createAuthorRequestDto.getAuthorName());
-        newMember.setOpenAlexId(createAuthorRequestDto.getOpenAlexId());
-        newMember.setSemanticId(createAuthorRequestDto.getSemanticId());
-        newMember.setEmail(createAuthorRequestDto.getEmail());
-        newMember.setPhone(createAuthorRequestDto.getPhone());
-        newMember.setAddress(createAuthorRequestDto.getAddress());
-        newMember.setTitle(createAuthorRequestDto.getTitle());
-        newMember.setPhoto(createAuthorRequestDto.getPhoto());
-        facultyMemberRepository.save(newMember);
-        FacultyMemberLogs facultyMemberLogs = new FacultyMemberLogs(newMember, "created");
-        facultyMemberLogsRepository.save(facultyMemberLogs);
-        return newMember;
-
+    public FacultyMember createFacultyMember(CreateAuthorRequestDto createAuthorRequestDto, String token){
+        if (adminRepository.countByEmail(extractSubject(token))>0){
+            Department department = departmentRepository.findByDepartmentId(createAuthorRequestDto.getDepartmentId()).get();
+            FacultyMember newMember = new FacultyMember();
+            newMember.setDepartmentId(department);
+            newMember.setAuthorName(createAuthorRequestDto.getAuthorName());
+            newMember.setOpenAlexId(createAuthorRequestDto.getOpenAlexId());
+            newMember.setSemanticId(createAuthorRequestDto.getSemanticId());
+            newMember.setEmail(createAuthorRequestDto.getEmail());
+            newMember.setPhone(createAuthorRequestDto.getPhone());
+            newMember.setAddress(createAuthorRequestDto.getAddress());
+            newMember.setTitle(createAuthorRequestDto.getTitle());
+            newMember.setPhoto(createAuthorRequestDto.getPhoto());
+            facultyMemberRepository.save(newMember);
+            FacultyMemberLogs facultyMemberLogs = new FacultyMemberLogs(newMember, "created");
+            facultyMemberLogsRepository.save(facultyMemberLogs);
+            return newMember;
+        }
+        else{
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
     }
 
-    public FacultyMember deleteFacultyMember(int id){
-        FacultyMember deletedMember = facultyMemberRepository.findByAuthorIdAndIsDeletedFalse(id).get();
-        deletedMember.setDeleted(true);
-        facultyMemberRepository.save(deletedMember);
-        FacultyMemberLogs facultyMemberLogs = new FacultyMemberLogs(deletedMember, "deleted");
-        facultyMemberLogsRepository.save(facultyMemberLogs);
-        return deletedMember;
-
+    public FacultyMember deleteFacultyMember(int id, String token){
+        if (adminRepository.countByEmail(extractSubject(token))>0){
+            FacultyMember deletedMember = facultyMemberRepository.findByAuthorIdAndIsDeletedFalse(id).get();
+            deletedMember.setDeleted(true);
+            facultyMemberRepository.save(deletedMember);
+            FacultyMemberLogs facultyMemberLogs = new FacultyMemberLogs(deletedMember, "deleted");
+            facultyMemberLogsRepository.save(facultyMemberLogs);
+            return deletedMember;
+        }
+    else{
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
     }
 
-    public FacultyMember editFacultyMember(CreateAuthorRequestDto createAuthorRequestDto, int id){
-        FacultyMember editedMember = facultyMemberRepository.findByAuthorIdAndIsDeletedFalse(id).get();
-        editedMember.setEmail(createAuthorRequestDto.getEmail());
-        editedMember.setPhone(createAuthorRequestDto.getPhone());
-        editedMember.setAddress(createAuthorRequestDto.getAddress());
-        editedMember.setTitle(createAuthorRequestDto.getTitle());
-        editedMember.setPhoto(createAuthorRequestDto.getPhoto());
-        facultyMemberRepository.save(editedMember);
-        FacultyMemberLogs facultyMemberLogs = new FacultyMemberLogs(editedMember, "edited");
-        facultyMemberLogsRepository.save(facultyMemberLogs);
-        return editedMember;
+    public FacultyMember editFacultyMember(CreateAuthorRequestDto createAuthorRequestDto, int id, String token){
+        if (adminRepository.countByEmail(extractSubject(token))>0){
+            FacultyMember editedMember = facultyMemberRepository.findByAuthorIdAndIsDeletedFalse(id).get();
+            editedMember.setEmail(createAuthorRequestDto.getEmail());
+            editedMember.setPhone(createAuthorRequestDto.getPhone());
+            editedMember.setAddress(createAuthorRequestDto.getAddress());
+            editedMember.setTitle(createAuthorRequestDto.getTitle());
+            editedMember.setPhoto(createAuthorRequestDto.getPhoto());
+            facultyMemberRepository.save(editedMember);
+            FacultyMemberLogs facultyMemberLogs = new FacultyMemberLogs(editedMember, "edited");
+            facultyMemberLogsRepository.save(facultyMemberLogs);
+            return editedMember;
+        }
+        else{
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
     }
-
 }
 

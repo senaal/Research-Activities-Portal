@@ -8,10 +8,15 @@ import com.uni.research_portal.model.FacultyMember;
 import com.uni.research_portal.model.ScientificArticle;
 import com.uni.research_portal.service.FacultyMemberService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
+
+import static com.uni.research_portal.util.Jwt.validateToken;
 
 @RestController
 @RequestMapping("facultymember")
@@ -20,8 +25,13 @@ public class FacultyMemberController {
     FacultyMemberService facultyMemberService;
 
     @GetMapping("/sync")
-    public ResponseEntity<String> syncFacultyMembers(){
-        return facultyMemberService.syncFacultyMembers();
+    public ResponseEntity<String> syncFacultyMembers( @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
+        if (validateToken(token.substring(7))) {
+            return facultyMemberService.syncFacultyMembers();
+        }
+        else{
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping("/{id}")
@@ -40,19 +50,34 @@ public class FacultyMemberController {
     }
 
     @PostMapping("/")
-    public FacultyMember createFacultyMember(@RequestBody CreateAuthorRequestDto createAuthorRequestDto){
-        return facultyMemberService.createFacultyMember(createAuthorRequestDto);
+    public FacultyMember createFacultyMember(@RequestBody CreateAuthorRequestDto createAuthorRequestDto,
+                                             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
+        if (validateToken(token.substring(7))) {
+            return facultyMemberService.createFacultyMember(createAuthorRequestDto, token.substring(7));
+        }
+        else{
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @DeleteMapping("/{id}")
-    public FacultyMember deleteFacultyMember(@PathVariable int id){
-        return facultyMemberService.deleteFacultyMember(id);
+    public FacultyMember deleteFacultyMember(@PathVariable int id,
+                                             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
+        if (validateToken(token.substring(7))) {
+            return facultyMemberService.deleteFacultyMember(id, token.substring(7));
+        }
+        else{
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PutMapping("/{id}")
-    public FacultyMember putMapping(@RequestBody CreateAuthorRequestDto createAuthorRequestDto, @PathVariable int id){
-        return facultyMemberService.editFacultyMember(createAuthorRequestDto,id);
+    public FacultyMember putMapping(@RequestBody CreateAuthorRequestDto createAuthorRequestDto, @PathVariable int id,
+                                    @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
+        if (validateToken(token.substring(7))) {
+            return facultyMemberService.editFacultyMember(createAuthorRequestDto,id, token);
+        }else{
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
     }
-
-
 }
