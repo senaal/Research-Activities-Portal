@@ -5,6 +5,8 @@ import Tabs from './Tabs';
 import Confirm from './Confirm';
 
 const Admin = () => {
+  const [adminEmail, setAdminEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [departmentName, setDepartmentName] = useState('');
   const [facultyId, setFacultyId] = useState('');
   const [facultyName, setFacultyName] = useState('');
@@ -42,6 +44,30 @@ const Admin = () => {
     fetchMembers();
   }, []);
 
+  const fetchWithAuth = async (url, options = {}) => {
+    const token = localStorage.getItem('token'); // Retrieve the token from local storage
+  
+    if (!token) {
+      throw new Error('No token found');
+    }
+  
+    const headers = {
+      ...options.headers,
+      'Authorization': `Bearer ${token}`,
+    };
+  
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
+  
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+  
+    return response;
+  };
+  
   const fetchFaculties = async () => {
     try {
       const response = await fetch('http://localhost:8080/faculty/');
@@ -87,17 +113,20 @@ const Admin = () => {
   const handleDepartmentSubmit = async () => {
     if (departmentName.trim() !== '') {
       try {
-        const response = await fetch('http://localhost:8080/department/', {
+        const response = await fetchWithAuth('http://localhost:8080/department/', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({ facultyId: facultyId, departmentName: departmentName }),
         });
+
         if (!response.ok) {
           throw new Error('Failed to create department');
         }
         const data = await response.json();
+        console.log("data")
+        console.log(data)
         setDepartmentName('');
         setFacultyId('');
         setPopupMessage('Department created successfully!');
@@ -112,11 +141,11 @@ const Admin = () => {
   const handleFacultySubmit = async () => {
     if (facultyName.trim() !== '') {
       try {
-        const response = await fetch('http://localhost:8080/faculty/', {
+        const response = await fetchWithAuth('http://localhost:8080/faculty/', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-          },
+            'Content-Type': 'application/json'
+              },
           body: JSON.stringify({ facultyName: facultyName }),
         });
         if (!response.ok) {
@@ -136,7 +165,7 @@ const Admin = () => {
   const handleFacultyMemberSubmit = async () => {
     if (newdepartmentId.trim() !== '') {
       try {
-        const response = await fetch('http://localhost:8080/facultymember/', {
+        const response = await fetchWithAuth('http://localhost:8080/facultymember/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -198,10 +227,10 @@ const Admin = () => {
       photo: photo,
       title: title,
     };
-    fetch(`http://localhost:8080/facultymember/${authorId}`, {
+    fetchWithAuth(`http://localhost:8080/facultymember/${authorId}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(editedData)
     })
@@ -219,10 +248,10 @@ const Admin = () => {
   };
 
   const handleDeleteFacultySubmit = () => {
-    fetch(`http://localhost:8080/faculty/${deletedFacultyId}`, {
+    fetchWithAuth(`http://localhost:8080/faculty/${deletedFacultyId}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
     })
     .then(response => {
@@ -241,10 +270,10 @@ const Admin = () => {
   };
 
   const handleDeleteDepartmentSubmit = () => {
-    fetch(`http://localhost:8080/department/${deletedDepartmentId}`, {
+    fetchWithAuth(`http://localhost:8080/department/${deletedDepartmentId}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
     })
     .then(response => {
@@ -283,10 +312,10 @@ const Admin = () => {
 
   const handleTriggerArticlesSubmit = () => {
     setSyncArticlesLoading(true); // Set loading to true when the action is triggered
-    fetch(`http://localhost:8080/article/sync`, {
+    fetchWithAuth(`http://localhost:8080/article/sync`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
     })
     .then(response => {
@@ -308,10 +337,10 @@ const Admin = () => {
 
   const handleTriggerFacultyMembersSubmit = () => {
     setSyncMembersLoading(true); // Set loading to true when the action is triggered
-    fetch(`http://localhost:8080/facultymember/sync`, {
+    fetchWithAuth(`http://localhost:8080/facultymember/sync`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
     })
     .then(response => {

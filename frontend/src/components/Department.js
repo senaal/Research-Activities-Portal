@@ -138,7 +138,7 @@ const Department = ({ departments }) => {
       );
     }
     return pageNumbers;
-
+  }
   const handleSortByChange = (event) => {
     setSortBy(event.target.value);
   };

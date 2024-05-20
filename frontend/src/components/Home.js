@@ -143,7 +143,6 @@ function Home() {
 
 return (
     <div className="App">
-      <h1 style={{ marginLeft: '1.5%', color: '#1f357a', fontFamily: 'Inria Sans, serif', fontSize:'50px' }}>BOGAZICI UNIVERSITY</h1>
       <div className='charts'>
         <div>
         <LineChart
@@ -247,7 +246,7 @@ return (
               </ul>
               {/* Pagination controls */}
               <div className="pagination-buttons">
-                <button onClick={handlePrevPage} disabled={page === 0} style={{ marginLeft: '45%' }}>
+                <button onClick={handlePrevPage} disabled={page === 0} style={{ marginLeft: '35%' }}>
                   <FontAwesomeIcon icon={faArrowLeft} />
                 </button>
                 {renderPageNumbers()}
