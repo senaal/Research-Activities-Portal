@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart, LineChart } from '@mui/x-charts';
+import { LineChart } from '@mui/x-charts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Tabs from './Tabs'; 
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HorizontalScroll from './HorizontalScroll';
-import { useParams } from 'react-router-dom'; // Import useParams to get parameters from URL
+import { useParams } from 'react-router-dom'; 
+import PieChart from './PieChart';
 
 const years = [
   new Date(2014, 0, 1),
@@ -35,6 +36,8 @@ const Faculty = () => {
     const [name, setName] = useState("");
     const [sortBy, setSortBy] = useState('publicationDate');
     const [sortOrder, setSortOrder] = useState('DESC');
+    const [researchAreasData, setResearchAreasData] = useState([]);
+
     const { id } = useParams(); 
     
 
@@ -69,8 +72,21 @@ const Faculty = () => {
         console.error('Error fetching data:', error);
       }
     };
+    const fetchResearchAreas = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/faculty/research-area/${id}`);
+        let data = await response.json();
+        setResearchAreasData(data);
+      } catch (error) {
+        console.error('Error fetching research areas data:', error);
+      }
+    };
+
+
 
     fetchDataMembers();
+    fetchResearchAreas();
+
   }, [id]); 
 
   const handleTabChange = (tab) => {
@@ -164,25 +180,10 @@ const Faculty = () => {
         </div>
       </div>
       <div className='charts'>
-        <div>
-          <PieChart
-            series={[
-              {
-                data: [
-                  { id: 0, value: 30, label: 'Telecommunication' },
-                  { id: 1, value: 25, label: 'Computer Networks' },
-                  { id: 2, value: 20, label: 'Algorithms' },
-                  { id: 3, value: 15, label: 'Artificial Intelligence' },
-                  { id: 4, value: 10, label: 'Internet of Things' },
-                ],
-                highlightScope: { faded: 'global', highlighted: 'item' },
-                faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-              },
-            ]}
-            width={700}
-            height={400}
-          />
-        </div>
+      <div className='piechart'>
+              <PieChart data={researchAreasData} />
+     
+          </div>
         <div className='chart'>
           <LineChart
             xAxis={[

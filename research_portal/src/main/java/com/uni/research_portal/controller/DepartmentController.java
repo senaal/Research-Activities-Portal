@@ -1,6 +1,7 @@
 package com.uni.research_portal.controller;
 
 import com.uni.research_portal.dto.CreateDepartmentDto;
+import com.uni.research_portal.dto.ResearchAreaDto;
 import com.uni.research_portal.model.Department;
 import com.uni.research_portal.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +45,11 @@ public class DepartmentController {
     public List<Department> getDepartments(){
         return departmentService.getDepartments();
     }
+
+    @GetMapping("/research-area/{id}")
+    public List<ResearchAreaDto> getAreas(@PathVariable int id){
+        return departmentService.getResearchAreas(id);
+    }
+
 
 }

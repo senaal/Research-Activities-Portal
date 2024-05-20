@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uni.research_portal.dto.AuthorInfoDto;
 import com.uni.research_portal.dto.CreateAuthorRequestDto;
 import com.uni.research_portal.dto.DepartmentMembers;
-import com.uni.research_portal.model.Department;
-import com.uni.research_portal.model.FacultyMember;
-import com.uni.research_portal.model.FacultyMemberLogs;
+import com.uni.research_portal.dto.ResearchAreaDto;
+import com.uni.research_portal.model.*;
 import com.uni.research_portal.repository.*;
 import com.uni.research_portal.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +45,12 @@ public class FacultyMemberService {
 
     @Autowired
     FacultyMemberLogsRepository facultyMemberLogsRepository;
+
+    @Autowired
+    ResearchAreaRepository researchAreaRepository;
+
+    @Autowired
+    ResearchAreaAuthorRepository researchAreaAuthorRepository;
 
     @Autowired
     AdminRepository adminRepository;
@@ -194,5 +199,63 @@ public class FacultyMemberService {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
     }
+
+    public ResponseEntity<String> addResearchAreas(){
+        try{
+            List<FacultyMember> members = facultyMemberRepository.findByIsDeletedFalse();
+            for (FacultyMember member : members) {
+                String id = member.getOpenAlexId();
+                String url = "https://api.openalex.org/authors/" + id;
+                UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url);
+                String urlWithParam = uriBuilder.toUriString();
+                ResponseEntity<String> response = restTemplate.exchange(urlWithParam, HttpMethod.GET, HttpEntity.EMPTY, String.class);
+                String responseBody = response.getBody();
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    JsonNode jsonNode = objectMapper.readTree(responseBody);
+                    if (jsonNode != null) {
+                        JsonNode xConcepts = jsonNode.get("topics");
+                        if(!xConcepts.isEmpty()){
+                            for(JsonNode concept : xConcepts) {
+                                String conceptId = concept.get("id").asText();
+                                ResearchArea area = researchAreaRepository.findByOpenAlexId(conceptId);
+                                if( area == null) {
+                                    area = new ResearchArea();
+
+                                }
+                                area.setFingerprintName(concept.get("display_name").asText());
+                                area.setOpenAlexId(conceptId);
+                                researchAreaRepository.save(area);
+                                ResearchAreaAuthor areaAuthor = new ResearchAreaAuthor();
+                                areaAuthor.setAuthorId(member);
+                                areaAuthor.setResearchAreaId(area);
+                                areaAuthor.setCount(concept.get("count").asInt());
+                                researchAreaAuthorRepository.save(areaAuthor);
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+            return new ResponseEntity<>("Research Areas Are Added.", HttpStatus.OK);
+        }catch(Exception e) {
+            return new ResponseEntity<>("Check the Request.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public List<ResearchAreaDto> getResearchAreas(int id){
+        FacultyMember member = facultyMemberRepository.findByAuthorIdAndIsDeletedFalse(id).get();
+        List<ResearchAreaAuthor> researchAreaAuthors = researchAreaAuthorRepository.findByAuthorId(member);
+        List<ResearchAreaDto> response = new ArrayList<>();
+        for(ResearchAreaAuthor areaAuthor : researchAreaAuthors){
+            ResearchArea area = areaAuthor.getResearchAreaId();
+            ResearchAreaDto dto = new ResearchAreaDto(area.getFingerprintName(),area.getResearchAreaId(),areaAuthor.getCount());
+            response.add(dto);
+        }
+        response.sort((dto1, dto2) -> Double.compare(dto2.getCount(), dto1.getCount()));
+        return response;
+    }
+
+
 }
 
