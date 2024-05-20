@@ -35,11 +35,6 @@ const PieChart = ({ data }) => {
         display: false,
         position: 'bottom',
       },
-      title: {
-        display: true,
-        position: 'top',
-        text: 'Research Areas With Related Articles Count',
-      },
       tooltip: {
         callbacks: {
           label: function (tooltipItem) {
@@ -58,7 +53,7 @@ const PieChart = ({ data }) => {
   };
 
   return (
-    <div style={{ position: 'relative', width: '60%', height: '100%' }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <Pie data={chartData} options={options} />
     </div>
   );

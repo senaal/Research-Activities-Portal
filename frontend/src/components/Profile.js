@@ -187,10 +187,15 @@ const Profile = () => {
       </div>
       <div className="author-header" style={{ marginLeft: '20px', flex: 2 }}>
         <div className='charts' style={{ display: 'flex' }}>
-          <div className='piechart'>
+
+          <div className='chart'>
+          <h2 style={{ textAlign: 'center' }}>Research Areas</h2>
+          <ResponsiveContainer width="100%" height={300}>
               <PieChart data={researchAreasData} />
      
+          </ResponsiveContainer>
           </div>
+
           <div className='chart'>
           <h2 style={{ textAlign: 'center' }}>Citations Over the Years</h2>
           <ResponsiveContainer width="100%" height={300}>
