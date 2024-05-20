@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uni.research_portal.dto.AuthorInfoDto;
 import com.uni.research_portal.dto.CreateAuthorRequestDto;
 import com.uni.research_portal.dto.DepartmentMembers;
+import com.uni.research_portal.model.Citations;
 import com.uni.research_portal.model.Department;
 import com.uni.research_portal.model.FacultyMember;
 import com.uni.research_portal.model.FacultyMemberLogs;
@@ -49,11 +50,14 @@ public class FacultyMemberService {
 
     @Autowired
     AdminRepository adminRepository;
+
+    @Autowired
+    CitationsRepository citationsRepository;
     public void updateMembers(String id) {
         try{
             String url = "https://api.openalex.org/authors/" + id;
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url)
-                    .queryParam("select", "display_name,cited_by_count,summary_stats");
+                    .queryParam("select", "display_name,cited_by_count,summary_stats,counts_by_year");
             String urlWithParam = uriBuilder.toUriString();
             ResponseEntity<String> response = restTemplate.exchange(urlWithParam, HttpMethod.GET, HttpEntity.EMPTY, String.class);
             String responseBody = response.getBody();
@@ -83,6 +87,33 @@ public class FacultyMemberService {
 
                     }
                     facultyMemberRepository.save(facultyMember);
+
+                    if (!jsonNode.get("counts_by_year").isEmpty()){
+                        for (int i = 0; i < jsonNode.get("counts_by_year").size(); i++) {
+                            int year = jsonNode.get("counts_by_year").get(i).get("year").asInt();
+                            int works_count = jsonNode.get("counts_by_year").get(i).get("works_count").asInt();
+                            int cited_by_count = jsonNode.get("counts_by_year").get(i).get("cited_by_count").asInt();
+                            if(citationsRepository.findByAuthorId(facultyMember.getAuthorId()).isEmpty()){
+                                Citations c = new Citations();
+                                c.setAuthorId(facultyMember.getAuthorId());
+                                c.setYear(year);
+                                c.setWorkCount(works_count);
+                                c.setCitedByCount(cited_by_count);
+                                citationsRepository.save(c);
+                            }
+                            else{
+                                Citations citation =  citationsRepository.findByAuthorIdAndYear(facultyMember.getAuthorId(), year);
+                                if(citation.getCitedByCount()!=cited_by_count){
+                                    citation.setCitedByCount(cited_by_count);
+                                    citationsRepository.save(citation);
+                                }
+                                if(citation.getWorkCount()!=works_count){
+                                    citation.setWorkCount(works_count);
+                                    citationsRepository.save(citation);
+                                }
+                            }
+                        }
+                    }
                 }
             } catch (Exception ignored) {}
             new ResponseEntity<>("Synchronization Completed.", HttpStatus.OK);

@@ -42,8 +42,7 @@ public class ScientificArticleService {
     ExternalFacultyMemberRepository externalFacultyMemberRepository;
     @Autowired
     DepartmentRepository departmentRepository;
-    @Autowired
-    FacultyRepository facultyRepository;
+
 
     @Autowired
     ScientificArticleLogsRepostory scientificArticleLogsRepostory;
