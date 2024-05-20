@@ -43,5 +43,8 @@ public class ScientificArticle {
     @Column(name = "is_rejected")
     private boolean isRejected;
 
+    @Column(name = "source")
+    private String source;
+
 }
 

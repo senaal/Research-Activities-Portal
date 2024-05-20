@@ -10,8 +10,11 @@ import com.uni.research_portal.service.FacultyMemberService;
 import com.uni.research_portal.service.ScientificArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -36,6 +39,7 @@ public class ScientificArticleController {
 
         int pageNum = page != null ? page : 0;
         int pageSize = size != null ? size : 10;
+
         return scientificArticleService.getAuthorArticles(id,sortBy,sortOrder,pageNum,pageSize);
     }
     @GetMapping("/department/{id}")

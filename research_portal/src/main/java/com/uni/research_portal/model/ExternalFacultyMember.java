@@ -22,6 +22,8 @@ public class ExternalFacultyMember {
 
     @Column
     private String affiliation;
+    @Column
+    private int semanticId;
     @Column(name="open_alex_id")
     private String openAlexId;
 }
