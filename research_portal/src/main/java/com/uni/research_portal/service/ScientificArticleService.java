@@ -59,11 +59,8 @@ public class ScientificArticleService {
                 JsonNode jsonNodeMeta = objectMapperMeta.readTree(responseBodyMeta);
                 int articleCount = jsonNodeMeta.get("meta").get("count").asInt();
                 int pageCount = (int)Math.ceil(articleCount/25.0);
-                System.out.println(pageCount);
                 for(int pageCo = 1; pageCo<=pageCount; pageCo++){
-                    System.out.println("page: "+pageCo);
                     String urlPage = "https://api.openalex.org/works?per-page=25&filter=author.id:" + id + "&page="+pageCo;
-                    System.out.println(urlPage);
                     UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(urlPage);
                     String urlWithParam = uriBuilder.toUriString();
                     ResponseEntity<String> response = restTemplate.exchange(urlWithParam, HttpMethod.GET, HttpEntity.EMPTY, String.class);
@@ -72,16 +69,12 @@ public class ScientificArticleService {
                     JsonNode jsonNode = objectMapper.readTree(responseBody);
                     if (jsonNode != null) {
                         for (int i = 0; i< jsonNode.get("results").size();i++) {
-                            System.out.println("------------------------------------------------------");
-                            System.out.println("article: " +i);
                             JsonNode resultNode = jsonNode.get("results").get(i);
                             JsonNode doiNode = resultNode.get("doi");
                             String doi;
                             if (doiNode != null && !doiNode.isNull()) {
                                 doi = doiNode.asText().substring("https://doi.org/".length());
-                                System.out.println("doi: " + doi);
                             } else {
-                                System.out.println("DOI is null or empty, skipping this article.");
                                 continue;
                             }
 
@@ -91,12 +84,8 @@ public class ScientificArticleService {
                                 ScientificArticle newArticle = new ScientificArticle();
                                 newArticle.setDoi(doi);
                                 newArticle.setArticleTitle(resultNode.get("title").asText());
-                                System.out.println("title: " + resultNode.get("title").asText());
                                 newArticle.setPublicationDate(Timestamp.valueOf(resultNode.get("publication_date").asText() + " 00:00:00"));
-                                System.out.println("date: " + resultNode.get("publication_date").asText());
                                 newArticle.setCitationCount(resultNode.get("cited_by_count").asInt());
-                                System.out.println("citation: " + resultNode.get("cited_by_count").asText());
-                                System.out.println("open_access: "+ resultNode.get("open_access").get("is_oa").asBoolean());
                                 if (resultNode.get("open_access").get("is_oa").asBoolean()) {
                                     newArticle.setOpenAccess(true);
                                     newArticle.setPaperPdf(resultNode.get("open_access").get("oa_url").asText());
@@ -105,16 +94,13 @@ public class ScientificArticleService {
                                 }
                                 newArticle.setSource("open_alex");
                                 scientificArticleRepository.save(newArticle);
-                                System.out.println("created article");
                                 scientificArticleLogsRepostory.save(new ScientificArticleLogs(newArticle, "created"));
 
                                 //adding article author
                                 for (JsonNode authorNode : resultNode.get("authorships")){
-                                    System.out.println("Author");
                                     ArticleAuthor articleAuthor = new ArticleAuthor();
                                     articleAuthor.setScientificArticle(newArticle);
                                     String openAlexId = authorNode.get("author").get("id").asText().substring(authorNode.get("author").get("id").asText().lastIndexOf("/") + 1);
-                                    System.out.println("id: "+openAlexId);
                                     FacultyMember facultyMember = facultyMemberRepository.findByOpenAlexId(openAlexId);
                                     if(facultyMember == null){
                                         ExternalFacultyMember externalFacultyMember = externalFacultyMemberRepository.findByOpenAlexId(openAlexId);
@@ -123,11 +109,9 @@ public class ScientificArticleService {
                                             ExternalFacultyMember newExtMember = new ExternalFacultyMember();
                                             newExtMember.setOpenAlexId(openAlexId);
                                             newExtMember.setAuthorName(authorNode.get("author").get("display_name").asText());
-                                            System.out.println("id: "+openAlexId);
                                             JsonNode affNode = authorNode.get("institutions");
                                             if(!affNode.isEmpty()) {
                                                 newExtMember.setAffiliation(affNode.get(0).get("display_name").asText());
-                                                System.out.println("inst: "+affNode.get(0).get("display_name").asText());
                                             }
                                             externalFacultyMemberRepository.save(newExtMember);
                                             articleAuthor.setIsFacultyMember(false);
@@ -148,7 +132,6 @@ public class ScientificArticleService {
                                 ScientificArticle article1 = article.get();
                                 if(Objects.equals(article1.getSource(), "open_alex")){
                                     int citCount = resultNode.get("cited_by_count").asInt();
-                                    System.out.println("updating citation: "+ citCount);
                                     if (article1.getCitationCount() !=  citCount){
                                         int coutn = article1.getCitationCount();
                                         article1.setCitationCount(resultNode.get("cited_by_count").asInt());
@@ -183,16 +166,12 @@ public class ScientificArticleService {
                 if (jsonNode != null) {
                     if (!jsonNode.get("papers").isEmpty()){
                         for (int i = 0; i < jsonNode.get("papers").size(); i++) {
-                            System.out.println("------------------------------------------------------");
-                            System.out.println("article: " + i);
                             JsonNode resultNode = jsonNode.get("papers").get(i);
                             JsonNode doiNode = resultNode.get("externalIds").get("DOI");
                             String doi;
                             if (doiNode != null && !doiNode.isNull()) {
                                 doi = doiNode.asText();
-                                System.out.println("doi: " + doi);
                             } else {
-                                System.out.println("DOI is null or empty, skipping this article.");
                                 continue;
                             }
 
@@ -202,12 +181,8 @@ public class ScientificArticleService {
                                 ScientificArticle newArticle = new ScientificArticle();
                                 newArticle.setDoi(doi);
                                 newArticle.setArticleTitle(resultNode.get("title").asText());
-                                System.out.println("title: " + resultNode.get("title").asText());
                                 newArticle.setPublicationDate(Timestamp.valueOf(resultNode.get("publicationDate").asText() + " 00:00:00"));
-                                System.out.println("date: " + resultNode.get("publicationDate").asText());
                                 newArticle.setCitationCount(resultNode.get("citationCount").asInt());
-                                System.out.println("citation: " + resultNode.get("citationCount").asText());
-                                System.out.println("open_access: " + resultNode.get("isOpenAccess").asBoolean());
                                 if (resultNode.get("isOpenAccess").asBoolean()) {
                                     newArticle.setOpenAccess(true);
                                     newArticle.setPaperPdf(resultNode.get("openAccessPdf").asText());
@@ -216,16 +191,13 @@ public class ScientificArticleService {
                                 }
                                 newArticle.setSource("semantic");
                                 scientificArticleRepository.save(newArticle);
-                                System.out.println("created article");
                                 scientificArticleLogsRepostory.save(new ScientificArticleLogs(newArticle, "created"));
 
                                 //adding article author
                                 for (JsonNode authorNode : resultNode.get("authors")) {
-                                    System.out.println("Author");
                                     ArticleAuthor articleAuthor = new ArticleAuthor();
                                     articleAuthor.setScientificArticle(newArticle);
                                     int semanticId = authorNode.get("authorId").asInt();
-                                    System.out.println("id: " + semanticId);
                                     FacultyMember facultyMember = facultyMemberRepository.findBySemanticId(semanticId);
                                     if (facultyMember == null) {
                                         ExternalFacultyMember externalFacultyMember = externalFacultyMemberRepository.findBySemanticId(semanticId);
@@ -234,7 +206,6 @@ public class ScientificArticleService {
                                             ExternalFacultyMember newExtMember = new ExternalFacultyMember();
                                             newExtMember.setSemanticId(semanticId);
                                             newExtMember.setAuthorName(authorNode.get("name").asText());
-                                            System.out.println("id: " + semanticId);
 
                                             String urlAuthor = "https://api.semanticscholar.org/graph/v1/author/" + semanticId + "?fields=url,name,affiliations";
                                             UriComponentsBuilder uriBuilderAuthor = UriComponentsBuilder.fromUriString(urlAuthor);
@@ -246,7 +217,6 @@ public class ScientificArticleService {
                                             if (jsonNodeAuthor != null) {
                                                 if(!jsonNodeAuthor.get("affiliations").isEmpty()){
                                                     newExtMember.setAffiliation(jsonNodeAuthor.get("affiliations").get(0).asText());
-                                                    System.out.println("inst: " + jsonNodeAuthor.get("affiliations").get(0).asText());
                                                 }
                                             }
                                             externalFacultyMemberRepository.save(newExtMember);
@@ -268,7 +238,6 @@ public class ScientificArticleService {
                                 ScientificArticle article1 = article.get();
                                 if(Objects.equals(article1.getSource(), "semantic")){
                                     int citCount = resultNode.get("citationCount").asInt();
-                                    System.out.println("updating citation: " + citCount);
                                     if (article1.getCitationCount() != citCount) {
                                         int coutn = article1.getCitationCount();
                                         article1.setCitationCount(resultNode.get("citationCount").asInt());
