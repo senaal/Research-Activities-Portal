@@ -4,6 +4,7 @@ package com.uni.research_portal.controller;
 import com.uni.research_portal.dto.AuthorInfoDto;
 import com.uni.research_portal.dto.CreateAuthorRequestDto;
 import com.uni.research_portal.dto.DepartmentMembers;
+import com.uni.research_portal.dto.ResearchAreaDto;
 import com.uni.research_portal.model.FacultyMember;
 import com.uni.research_portal.model.ScientificArticle;
 import com.uni.research_portal.service.FacultyMemberService;
@@ -80,4 +81,15 @@ public class FacultyMemberController {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @GetMapping("/research-area")
+    public ResponseEntity<String> addAreas(){
+        return facultyMemberService.addResearchAreas();
+    }
+
+    @GetMapping("/research-area/{id}")
+    public List<ResearchAreaDto> getAreas(@PathVariable int id){
+        return facultyMemberService.getResearchAreas(id);
+    }
+
 }

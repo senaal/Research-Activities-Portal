@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart } from '@mui/x-charts';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Tabs from './Tabs'; 
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HorizontalScroll from './HorizontalScroll';
 import { useParams } from 'react-router-dom'; 
+import PieChart from './PieChart';
 
 
 const Faculty = () => {
@@ -20,6 +20,8 @@ const Faculty = () => {
     const [sortOrder, setSortOrder] = useState('DESC');
     const [years, setYears] = useState([]);
     const [citations, setCitations] = useState([]);
+    const [researchAreasData, setResearchAreasData] = useState([]);
+
     const { id } = useParams(); 
     
 
@@ -59,8 +61,21 @@ const Faculty = () => {
         console.error('Error fetching data:', error);
       }
     };
+    const fetchResearchAreas = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/faculty/research-area/${id}`);
+        let data = await response.json();
+        setResearchAreasData(data);
+      } catch (error) {
+        console.error('Error fetching research areas data:', error);
+      }
+    };
+
+
 
     fetchDataMembers();
+    fetchResearchAreas();
+
   }, [id]); 
 
   const handleTabChange = (tab) => {
@@ -154,25 +169,10 @@ const Faculty = () => {
         </div>
       </div>
       <div className='charts'>
-        <div>
-          <PieChart
-            series={[
-              {
-                data: [
-                  { id: 0, value: 30, label: 'Telecommunication' },
-                  { id: 1, value: 25, label: 'Computer Networks' },
-                  { id: 2, value: 20, label: 'Algorithms' },
-                  { id: 3, value: 15, label: 'Artificial Intelligence' },
-                  { id: 4, value: 10, label: 'Internet of Things' },
-                ],
-                highlightScope: { faded: 'global', highlighted: 'item' },
-                faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-              },
-            ]}
-            width={700}
-            height={400}
-          />
-        </div>
+      <div className='piechart'>
+              <PieChart data={researchAreasData} />
+     
+          </div>
         <div className='chart'>
           <h2 style={{ textAlign: 'center' }}>Citations Over the Years</h2>
           <ResponsiveContainer width="100%" height={300}>
