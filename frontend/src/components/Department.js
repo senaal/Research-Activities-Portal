@@ -1,32 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import './department.css';
-import { LineChart } from '@mui/x-charts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Tabs from './Tabs'; 
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HorizontalScroll from './HorizontalScroll';
 import PieChart from './PieChart';
-
-const years = [
-  new Date(2012, 0, 1),
-  new Date(2013, 0, 1),
-  new Date(2014, 0, 1),
-  new Date(2015, 0, 1),
-  new Date(2016, 0, 1),
-  new Date(2017, 0, 1),
-  new Date(2018, 0, 1),
-  new Date(2019, 0, 1),
-  new Date(2020, 0, 1),
-  new Date(2021, 0, 1),
-  new Date(2022, 0, 1),
-  new Date(2023, 0, 1),
-  new Date(2024, 0, 1),
-];
-const citations = [
-  3549, 3616, 6845, 7613, 4553, 6727, 3669, 3657,
-  5663, 6527, 6827, 7124, 918,
-];
 
 
 const Department = ({ departments }) => {
@@ -40,9 +20,9 @@ const Department = ({ departments }) => {
   const [sortBy, setSortBy] = useState('publicationDate');
   const [sortOrder, setSortOrder] = useState('DESC');
   const [members, setMembers] = useState([]);
+  const [years, setYears] = useState([]);
+  const [citations, setCitations] = useState([]);
   const [researchAreasData, setResearchAreasData] = useState([]);
-
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,6 +37,12 @@ const Department = ({ departments }) => {
         const filteredMembers = data.filter(member => member.department.departmentId === parseInt(id));
         setMembers(filteredMembers);
         setDepartmentName(filteredMembers[0].department.departmentName);
+
+        const citationsResponse = await fetch(`http://localhost:8080/citation/department/${id}`);
+        let citations = await citationsResponse.json();
+        setYears(citations.years.map(year => new Date(year, 0, 1))); 
+        setCitations(citations.citations);
+        
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -178,28 +164,25 @@ const Department = ({ departments }) => {
      
           </div>
         <div className='chart'>
-          <LineChart
-            xAxis={[
-              {
-                id: 'Years',
-                data: years,
-                scaleType: 'time',
-                valueFormatter: (date) => date.getFullYear().toString(),
-              },
-            ]}
-            series={[
-              {
-                id: 'Cmpe',
-                label: 'Citations',
-                data: citations,
-                stack: 'total',
-                area: false,
-                showMark: false,
-              },
-            ]}
-            width={700}
-            height={400}
-          />
+          <h2 style={{ textAlign: 'center' }}>Citations Over the Years</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={years.map((year, index) => ({ year, citations: citations[index] }))}>
+              <XAxis
+                dataKey="year"
+                tickFormatter={(tick) => new Date(tick).getFullYear()}
+                tick={{ fontSize: 10, angle: -45, textAnchor: 'end' }}
+                interval={0}
+              />
+              <YAxis
+                label={{ value: 'Citations', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip
+                labelFormatter={(value) => `Year: ${new Date(value).getFullYear()}`} // Customize tooltip label
+                formatter={(value) => [`Citations: ${value}`, '']} // Customize tooltip value
+              />
+              <Line type="monotone" dataKey="citations" stroke="#8884d8" dot={false}/>
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
       

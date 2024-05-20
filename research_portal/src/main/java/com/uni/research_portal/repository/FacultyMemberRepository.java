@@ -20,4 +20,6 @@ public interface FacultyMemberRepository extends JpaRepository<FacultyMember, In
 
     List<FacultyMember> findByDepartmentIdIn(List<Department> departments);
     List<FacultyMember> findByDepartmentIdDepartmentId(Integer departmentId);
+    FacultyMember findBySemanticId(int id);
+
 }

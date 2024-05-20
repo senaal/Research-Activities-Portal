@@ -5,25 +5,27 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
-@Entity
 @NoArgsConstructor
-@Table(name = "external_faculty_member")
-public class ExternalFacultyMember {
+@Table(name = "citations")
+public class Citations {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private Integer externalAuthorId;
+    @Column(name = "citation_id")
+    private Integer citationId;
 
     @Column
-    private String authorName;
+    private Integer authorId;
 
     @Column
-    private String affiliation;
+    private int year;
+
     @Column
-    private int semanticId;
-    @Column(name="open_alex_id")
-    private String openAlexId;
+    private int workCount;
+
+    @Column
+    private int citedByCount;
 }

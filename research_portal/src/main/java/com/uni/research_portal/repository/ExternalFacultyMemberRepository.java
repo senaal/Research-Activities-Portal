@@ -7,4 +7,5 @@ public interface ExternalFacultyMemberRepository extends JpaRepository<ExternalF
     ExternalFacultyMember findByOpenAlexId(String id);
 
     ExternalFacultyMember findByExternalAuthorId(int id);
+    ExternalFacultyMember findBySemanticId(int id);
 }
