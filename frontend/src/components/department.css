@@ -65,10 +65,12 @@ a {
 .charts {
     display: flex;
     margin-top: 5%;
+    margin-right: 5%;
 }
 
 .chart {
     flex: 1;
+
 }
 
 

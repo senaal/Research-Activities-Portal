@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faPhone, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
-import { LineChart } from '@mui/x-charts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import PieChart from './PieChart';
 import './profile.css';
 import Tabs from './Tabs'; 
@@ -19,6 +19,8 @@ const Profile = () => {
   const [sortBy, setSortBy] = useState('publicationDate');
   const [sortOrder, setSortOrder] = useState('DESC');
   const [activeTab, setActiveTab] = useState('Scientific Articles'); 
+  const [years, setYears] = useState([]);
+  const [citations, setCitations] = useState([]);
 
 
   const { id } = useParams();
@@ -39,6 +41,12 @@ const Profile = () => {
         const articlesData = await articlesResponse.json();
         setArticles(articlesData.content);
         setMaxPage(articlesData.totalPages);
+
+        const citationsResponse = await fetch(`http://localhost:8080/citation/${id}`);
+        let citations = await citationsResponse.json();
+        setYears(citations.years.map(year => new Date(year, 0, 1))); 
+        setCitations(citations.citations);
+
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -79,26 +87,7 @@ const Profile = () => {
     setSortOrder(event.target.value);
   };
 
-  const years = [
-    new Date(2012, 0, 1),
-    new Date(2013, 0, 1),
-    new Date(2014, 0, 1),
-    new Date(2015, 0, 1),
-    new Date(2016, 0, 1),
-    new Date(2017, 0, 1),
-    new Date(2018, 0, 1),
-    new Date(2019, 0, 1),
-    new Date(2020, 0, 1),
-    new Date(2021, 0, 1),
-    new Date(2022, 0, 1),
-    new Date(2023, 0, 1),
-    new Date(2024, 0, 1),
-  ];
 
-  const citations = [
-    3549, 3616, 6845, 7613, 4553, 6727, 3669, 3657,
-    5663, 6527, 6827, 7124, 918,
-  ];
 
   const renderPageNumbers = () => {
     const pageNumbers = [];
@@ -161,7 +150,6 @@ const Profile = () => {
     }
     return pageNumbers;
   };
-  
 
   return (
     <div className="author" style={{ display: 'flex', flexDirection: 'row' }}>
@@ -204,29 +192,26 @@ const Profile = () => {
      
           </div>
           <div className='chart'>
-            <LineChart
-              xAxis={[
-                {
-                  id: 'Years',
-                  data: years,
-                  scaleType: 'time',
-                  valueFormatter: (date) => date.getFullYear().toString(),
-                },
-              ]}
-              series={[
-                {
-                  id: 'Cmpe',
-                  label: 'Citations',
-                  data: citations,
-                  stack: 'total',
-                  area: false,
-                  showMark: false,
-                },
-              ]}
-              width={400}
-              height={200}
-            />
-          </div>
+          <h2 style={{ textAlign: 'center' }}>Citations Over the Years</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={years.map((year, index) => ({ year, citations: citations[index] }))}>
+              <XAxis
+                dataKey="year"
+                tickFormatter={(tick) => new Date(tick).getFullYear()}
+                tick={{ fontSize: 10, angle: -45, textAnchor: 'end' }}
+                interval={0}
+              />
+              <YAxis
+                label={{ value: 'Citations', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip
+                labelFormatter={(value) => `Year: ${new Date(value).getFullYear()}`} 
+                formatter={(value) => [`Citations: ${value}`, '']} 
+              />
+              <Line type="monotone" dataKey="citations" stroke="#8884d8" dot={false}/>
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
         </div>
         <div className="content-container" style={{ display: 'flex', flexDirection: 'row', marginTop: '20px' }}>
           <div className="main-content" style={{ flex: 1 }}>
