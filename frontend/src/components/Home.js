@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart } from '@mui/x-charts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import PieChart from './PieChart';
 import Tabs from './Tabs'; 
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HorizontalScroll from './HorizontalScroll';
-import PieChart from './PieChart';
 
 
 const years = [
@@ -38,7 +38,6 @@ function Home() {
   const [researchAreasData, setResearchAreasData] = useState([]);
 
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -65,7 +64,6 @@ function Home() {
         console.error('Error fetching research areas data:', error);
       }
     };
-
 
     fetchData();
     fetchResearchAreas();
@@ -158,61 +156,36 @@ function Home() {
 return (
     <div className="App">
       <div className='charts'>
-        <div>
-        <LineChart
-            xAxis={[
-              {
-                id: 'Years',
-                data: years,
-                scaleType: 'time',
-                valueFormatter: (date) => date.getFullYear().toString(),
-              },
-            ]}
-            series={[
-              {
-                id: 'Cmpe',
-                label: 'Scientific Article Count',
-                data: citations,
-                stack: 'total',
-                area: false,
-                showMark: false,
-              },
-            ]}
-            width={450}
-            height={360}
-          />
-        </div>
-        <div className='piechart'>
+      <div className='chart'>
+          <h2 style={{ textAlign: 'center' }}>Research Areas</h2>
+          <ResponsiveContainer width="100%" height={300}>
               <PieChart data={researchAreasData} />
-
-          
-        </div>
+     
+          </ResponsiveContainer>
+          </div>
         <div className='chart'>
-          <LineChart
-            xAxis={[
-              {
-                id: 'Years',
-                data: years,
-                scaleType: 'time',
-                valueFormatter: (date) => date.getFullYear().toString(),
-              },
-            ]}
-            series={[
-              {
-                id: 'Cmpe',
-                label: 'Citations',
-                data: citations,
-                stack: 'total',
-                area: false,
-                showMark: false,
-              },
-            ]}
-            width={450}
-            height={360}
-          />
+          <h2 style={{ textAlign: 'center' }}>Citations Over the Years</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={years.map((year, index) => ({ year, citations: citations[index] }))}>
+              <XAxis
+                dataKey="year"
+                tickFormatter={(tick) => new Date(tick).getFullYear()}
+                tick={{ fontSize: 10, angle: -45, textAnchor: 'end' }}
+                interval={0}
+              />
+              <YAxis
+                label={{ value: 'Citations', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip
+                labelFormatter={(value) => `Year: ${new Date(value).getFullYear()}`} // Customize tooltip label
+                formatter={(value) => [`Citations: ${value}`, '']} // Customize tooltip value
+              />
+              <Line type="monotone" dataKey="citations" stroke="#8884d8" dot={false}/>
+            </LineChart>
+          </ResponsiveContainer>
         </div>
+      </div>
         <div className="tabs" style={{ marginTop: '20px' }}>
-        </div>
         </div>
 
         <Tabs
