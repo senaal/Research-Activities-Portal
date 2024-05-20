@@ -170,25 +170,13 @@
   margin: 0 5px;
   color: #666;
 }
-/*
-.pagination-buttons button {
-  background-color: white;
-  border: 1px solid #ccc;
-  color: black;
-  cursor: pointer;
-  padding: 5px 10px;
-}*/
+
 
 .pagination-buttons button:hover {
   background-color: #1f357a;
   opacity: 1;
 }
-/*
-.pagination-buttons button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-*/
+
 .number-of{
   margin-top: 30px;
   text-align: left;
@@ -269,4 +257,8 @@
   margin-right: 20px;
   padding: 5px;
   font-size: 14px;
+}
+
+.piechart{
+  width: 100%;
 }

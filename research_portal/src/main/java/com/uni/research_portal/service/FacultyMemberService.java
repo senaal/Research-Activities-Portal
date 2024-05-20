@@ -214,7 +214,7 @@ public class FacultyMemberService {
                 try {
                     JsonNode jsonNode = objectMapper.readTree(responseBody);
                     if (jsonNode != null) {
-                        JsonNode xConcepts = jsonNode.get("x_concepts");
+                        JsonNode xConcepts = jsonNode.get("topics");
                         if(!xConcepts.isEmpty()){
                             for(JsonNode concept : xConcepts) {
                                 String conceptId = concept.get("id").asText();
@@ -229,7 +229,7 @@ public class FacultyMemberService {
                                 ResearchAreaAuthor areaAuthor = new ResearchAreaAuthor();
                                 areaAuthor.setAuthorId(member);
                                 areaAuthor.setResearchAreaId(area);
-                                areaAuthor.setScore(concept.get("score").asDouble());
+                                areaAuthor.setCount(concept.get("count").asInt());
                                 researchAreaAuthorRepository.save(areaAuthor);
                             }
                         }
@@ -249,9 +249,10 @@ public class FacultyMemberService {
         List<ResearchAreaDto> response = new ArrayList<>();
         for(ResearchAreaAuthor areaAuthor : researchAreaAuthors){
             ResearchArea area = areaAuthor.getResearchAreaId();
-            ResearchAreaDto dto = new ResearchAreaDto(area.getFingerprintName(),area.getResearchAreaId(),areaAuthor.getScore());
+            ResearchAreaDto dto = new ResearchAreaDto(area.getFingerprintName(),area.getResearchAreaId(),areaAuthor.getCount());
             response.add(dto);
         }
+        response.sort((dto1, dto2) -> Double.compare(dto2.getCount(), dto1.getCount()));
         return response;
     }
 

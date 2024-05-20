@@ -91,4 +91,5 @@ public class FacultyMemberController {
     public List<ResearchAreaDto> getAreas(@PathVariable int id){
         return facultyMemberService.getResearchAreas(id);
     }
+
 }

@@ -17,5 +17,7 @@ public interface FacultyMemberRepository extends JpaRepository<FacultyMember, In
     List<FacultyMember> findByDepartmentIdAndIsDeletedFalse(Department department);
 
     List<FacultyMember> findByDepartmentIdDepartmentIdIn(List<Integer> departmentIds);
+
+    List<FacultyMember> findByDepartmentIdIn(List<Department> departments);
     List<FacultyMember> findByDepartmentIdDepartmentId(Integer departmentId);
 }

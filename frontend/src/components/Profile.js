@@ -2,19 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faPhone, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
-import { PieChart, LineChart } from '@mui/x-charts';
+import { LineChart } from '@mui/x-charts';
+import PieChart from './PieChart';
 import './profile.css';
 import Tabs from './Tabs'; 
+
+
 
 const Profile = () => {
   const [author, setAuthor] = useState(null);
   const [articles, setArticles] = useState([]);
   const [maxPage, setMaxPage] = useState(0);
+  const [researchAreasData, setResearchAreasData] = useState([]);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [sortBy, setSortBy] = useState('publicationDate');
   const [sortOrder, setSortOrder] = useState('DESC');
   const [activeTab, setActiveTab] = useState('Scientific Articles'); 
+
 
   const { id } = useParams();
 
@@ -38,8 +43,18 @@ const Profile = () => {
         console.error('Error fetching data:', error);
       }
     };
+    const fetchResearchAreas = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/facultymember/research-area/${id}`);
+        let data = await response.json();
+        setResearchAreasData(data);
+      } catch (error) {
+        console.error('Error fetching research areas data:', error);
+      }
+    };
 
     fetchData();
+    fetchResearchAreas();
   }, [id, page, size, sortBy, sortOrder]);
 
   const handleNextPage = () => {
@@ -146,6 +161,7 @@ const Profile = () => {
     }
     return pageNumbers;
   };
+  
 
   return (
     <div className="author" style={{ display: 'flex', flexDirection: 'row' }}>
@@ -183,22 +199,9 @@ const Profile = () => {
       </div>
       <div className="author-header" style={{ marginLeft: '20px', flex: 2 }}>
         <div className='charts' style={{ display: 'flex' }}>
-          <div>
-            <PieChart
-              series={[
-                {
-                  data: [
-                    { id: 0, value: 30, label: 'Telecommunication' },
-                    { id: 1, value: 25, label: 'Computer Networks' },
-                    { id: 2, value: 20, label: 'Algorithms' },
-                    { id: 3, value: 15, label: 'Artificial Intelligence' },
-                    { id: 4, value: 10, label: 'Internet of Things' },
-                  ],
-                },
-              ]}
-              width={500}
-              height={200}
-            />
+          <div className='piechart'>
+              <PieChart data={researchAreasData} />
+     
           </div>
           <div className='chart'>
             <LineChart
