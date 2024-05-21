@@ -41,6 +41,7 @@ const Profile = () => {
         let authorData = data.member;
         authorData.articleCount = data.numberOfArticles;
         authorData.projectCount = data.numberOfProjects;
+        authorData.researchAreaCount = data.numberOfResearchAreas;
         setAuthor(authorData);
 
         // Fetch articles data for the author with pagination
@@ -271,7 +272,7 @@ const Profile = () => {
             </div>
             <div className="count">
               <div className="project-count-circle">
-                <span>{7}</span>
+                <span>{author && author.researchAreaCount}</span>
               </div>
               <h3 className="project-count-label"><strong>Research Areas</strong> </h3>
             </div>

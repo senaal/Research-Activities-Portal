@@ -9,5 +9,7 @@ import java.util.List;
 public interface ResearchAreaAuthorRepository extends JpaRepository<ResearchAreaAuthor, Integer> {
     List<ResearchAreaAuthor> findByAuthorId(FacultyMember member);
     List<ResearchAreaAuthor> findByAuthorIdIn(List<FacultyMember> member);
+    int countByAuthorId(FacultyMember authorId);
+
 
 }

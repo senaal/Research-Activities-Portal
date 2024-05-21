@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ResearchAreaRepository extends JpaRepository<ResearchArea, Integer> {
     ResearchArea findByOpenAlexId(String id);
-    List<ResearchArea> findByResearchAreaId(int id);
+
 }

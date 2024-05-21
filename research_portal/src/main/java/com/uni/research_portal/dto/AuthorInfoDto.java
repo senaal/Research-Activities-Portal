@@ -10,5 +10,6 @@ public class AuthorInfoDto {
     private FacultyMember member;
     private int numberOfArticles;
     private int numberOfProjects;
+    private int numberOfResearchAreas;
 
 }
