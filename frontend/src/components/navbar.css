@@ -5,12 +5,12 @@
     height: 30%;
 
 }
-.uniname {
+.header .uniname {
     color: white;
     font-family: 'Poppins';
     font-weight: lighter;
     flex-grow: 1; 
-    text-align: center;
+    margin-left: 20%;
 }
 
 .unilogo img {

@@ -15,7 +15,7 @@ import java.util.*;
 public class CitationService {
 
     @Autowired
-    private CitationsRepository citationsRepository;
+    CitationsRepository citationsRepository;
     @Autowired
     FacultyMemberRepository facultyMemberRepository;
     @Autowired
