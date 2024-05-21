@@ -25,16 +25,20 @@ public class CitationService {
         List<Citations> citationsList = citationsRepository.findByAuthorId(authorId);
         List<Integer> yearsList = new ArrayList<>();
         List<Integer> citationsCountList = new ArrayList<>();
+        List<Integer> worksCountList = new ArrayList<>();
         citationsList.sort(Comparator.comparingInt(Citations::getYear));
 
         for (Citations citation : citationsList) {
             yearsList.add(citation.getYear());
             citationsCountList.add(citation.getCitedByCount());
+            worksCountList.add(citation.getWorkCount());
         }
 
         Map<String, List<Integer>> result = new HashMap<>();
         result.put("years", yearsList);
         result.put("citations", citationsCountList);
+        result.put("worksCount", worksCountList);
+
 
         return result;
     }
@@ -42,6 +46,7 @@ public class CitationService {
     public Map<String, List<Integer>> getDepartmentStatisticsByDepartmentId(Integer departmentId) {
         List<FacultyMember> facultyMembers = facultyMemberRepository.findByDepartmentIdDepartmentId(departmentId);
         Map<Integer, Integer> yearCitationsMap = new HashMap<>();
+        Map<Integer, Integer> yearWorksMap = new HashMap<>();
 
         for (FacultyMember fm : facultyMembers) {
             Integer authorId = fm.getAuthorId();
@@ -49,20 +54,25 @@ public class CitationService {
             for (Citations citation : citationsList) {
                 int year = citation.getYear();
                 int citationsCount = citation.getCitedByCount();
+                int worksCount = citation.getWorkCount();
                 yearCitationsMap.put(year, yearCitationsMap.getOrDefault(year, 0) + citationsCount);
+                yearWorksMap.put(year, yearWorksMap.getOrDefault(year, 0) + worksCount);
             }
         }
 
         List<Integer> yearsList = new ArrayList<>(yearCitationsMap.keySet());
         Collections.sort(yearsList);
         List<Integer> citationsCountList = new ArrayList<>();
+        List<Integer> worksCountList = new ArrayList<>();
         for (Integer year : yearsList) {
             citationsCountList.add(yearCitationsMap.get(year));
+            worksCountList.add(yearWorksMap.get(year));
         }
 
         Map<String, List<Integer>> result = new HashMap<>();
         result.put("years", yearsList);
         result.put("citations", citationsCountList);
+        result.put("worksCount", worksCountList);
 
         return result;
     }
@@ -75,6 +85,7 @@ public class CitationService {
         }
         List<FacultyMember> facultyMembers = facultyMemberRepository.findByDepartmentIdDepartmentIdIn(departmentIds);
         Map<Integer, Integer> yearCitationsMap = new HashMap<>();
+        Map<Integer, Integer> yearWorksMap = new HashMap<>();
 
         for (FacultyMember fm : facultyMembers) {
             Integer authorId = fm.getAuthorId();
@@ -82,20 +93,60 @@ public class CitationService {
             for (Citations citation : citationsList) {
                 int year = citation.getYear();
                 int citationsCount = citation.getCitedByCount();
+                int worksCount = citation.getWorkCount();
                 yearCitationsMap.put(year, yearCitationsMap.getOrDefault(year, 0) + citationsCount);
+                yearWorksMap.put(year, yearWorksMap.getOrDefault(year, 0) + worksCount);
             }
         }
 
         List<Integer> yearsList = new ArrayList<>(yearCitationsMap.keySet());
         Collections.sort(yearsList);
         List<Integer> citationsCountList = new ArrayList<>();
+        List<Integer> worksCountList = new ArrayList<>();
         for (Integer year : yearsList) {
             citationsCountList.add(yearCitationsMap.get(year));
+            worksCountList.add(yearWorksMap.get(year));
         }
 
         Map<String, List<Integer>> result = new HashMap<>();
         result.put("years", yearsList);
         result.put("citations", citationsCountList);
+        result.put("worksCount", worksCountList);
+
+        return result;
+    }
+
+    public Map<String, List<Integer>> getAllStatistics() {
+        List<FacultyMember> facultyMembers = facultyMemberRepository.findAll();
+        Map<Integer, Integer> yearCitationsMap = new HashMap<>();
+        Map<Integer, Integer> yearWorksMap = new HashMap<>();
+
+        for (FacultyMember fm : facultyMembers) {
+            Integer authorId = fm.getAuthorId();
+            List<Citations> citationsList = citationsRepository.findByAuthorId(authorId);
+            for (Citations citation : citationsList) {
+                int year = citation.getYear();
+                int citationsCount = citation.getCitedByCount();
+                int worksCount = citation.getWorkCount();
+                yearCitationsMap.put(year, yearCitationsMap.getOrDefault(year, 0) + citationsCount);
+                yearWorksMap.put(year, yearWorksMap.getOrDefault(year, 0) + worksCount);
+
+            }
+        }
+
+        List<Integer> yearsList = new ArrayList<>(yearCitationsMap.keySet());
+        Collections.sort(yearsList);
+        List<Integer> citationsCountList = new ArrayList<>();
+        List<Integer> worksCountList = new ArrayList<>();
+        for (Integer year : yearsList) {
+            citationsCountList.add(yearCitationsMap.get(year));
+            worksCountList.add(yearWorksMap.get(year));
+        }
+
+        Map<String, List<Integer>> result = new HashMap<>();
+        result.put("years", yearsList);
+        result.put("citations", citationsCountList);
+        result.put("worksCount", worksCountList);
 
         return result;
     }

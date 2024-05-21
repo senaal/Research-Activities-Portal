@@ -132,8 +132,14 @@
     margin-top: 5%;
 }
 
+.charts h2 {
+  text-align: center;
+  font-family: 'Poppins';
+  font-weight: lighter;
+  text-align: center;
+  font-size: medium;
+}
 .chart {
-    margin-left: 10px; 
     flex: 1;
 }
 
