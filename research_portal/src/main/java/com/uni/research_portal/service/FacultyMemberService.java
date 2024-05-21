@@ -153,8 +153,10 @@ public class FacultyMemberService {
             response.setMember(member.get());
             int articleCount = articleAuthorRepository.countByAuthorId(member.get().getAuthorId());
             int projectCount = projectAuthorRepository.countByAuthorId(member.get().getAuthorId());
+            int researchAreaCount = researchAreaAuthorRepository.countByAuthorId(member.get());
             response.setNumberOfArticles(articleCount);
             response.setNumberOfProjects(projectCount);
+            response.setNumberOfResearchAreas(researchAreaCount);
             return response;
 
         }
@@ -253,20 +255,23 @@ public class FacultyMemberService {
                         JsonNode xConcepts = jsonNode.get("topics");
                         if(!xConcepts.isEmpty()){
                             for(JsonNode concept : xConcepts) {
-                                String conceptId = concept.get("id").asText();
-                                ResearchArea area = researchAreaRepository.findByOpenAlexId(conceptId);
-                                if( area == null) {
-                                    area = new ResearchArea();
+                                if(concept.get("count").asInt() >= 3 ){
+                                    String conceptId = concept.get("id").asText();
+                                    ResearchArea area = researchAreaRepository.findByOpenAlexId(conceptId);
+                                    if( area == null) {
+                                        area = new ResearchArea();
 
+                                    }
+                                    area.setFingerprintName(concept.get("display_name").asText());
+                                    area.setOpenAlexId(conceptId);
+                                    researchAreaRepository.save(area);
+                                    ResearchAreaAuthor areaAuthor = new ResearchAreaAuthor();
+                                    areaAuthor.setAuthorId(member);
+                                    areaAuthor.setResearchAreaId(area);
+                                    areaAuthor.setCount(concept.get("count").asInt());
+                                    researchAreaAuthorRepository.save(areaAuthor);
                                 }
-                                area.setFingerprintName(concept.get("display_name").asText());
-                                area.setOpenAlexId(conceptId);
-                                researchAreaRepository.save(area);
-                                ResearchAreaAuthor areaAuthor = new ResearchAreaAuthor();
-                                areaAuthor.setAuthorId(member);
-                                areaAuthor.setResearchAreaId(area);
-                                areaAuthor.setCount(concept.get("count").asInt());
-                                researchAreaAuthorRepository.save(areaAuthor);
+
                             }
                         }
                     }
