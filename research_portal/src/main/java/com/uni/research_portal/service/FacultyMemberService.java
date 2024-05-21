@@ -102,6 +102,7 @@ public class FacultyMemberService {
                             int year = jsonNode.get("counts_by_year").get(i).get("year").asInt();
                             int works_count = jsonNode.get("counts_by_year").get(i).get("works_count").asInt();
                             int cited_by_count = jsonNode.get("counts_by_year").get(i).get("cited_by_count").asInt();
+
                             if(citationsRepository.findByAuthorIdAndYear(facultyMember.getAuthorId(),year)==null){
                                 Citations c = new Citations();
                                 c.setAuthorId(facultyMember.getAuthorId());

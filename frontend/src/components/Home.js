@@ -9,13 +9,18 @@ import HorizontalScroll from './HorizontalScroll';
 
 function Home() {
   const [articles, setArticles] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [maxPage, setMaxPage] = useState(0);
+  const [maxPageProject, setMaxPageProject] = useState(0);
   const [page, setPage] = useState(0);
+  const [pageProject, setPageProject] = useState(0);
   const [size, setSize] = useState(10);
   const [activeTab, setActiveTab] = useState('Scientific Articles');
   const [members, setMembers] = useState([]);
   const [sortBy, setSortBy] = useState('publicationDate');
   const [sortOrder, setSortOrder] = useState('DESC');
+  const [sortByProject, setSortByProject] = useState('endDate');
+  const [sortOrderProject, setSortOrderProject] = useState('DESC');
   const [researchAreasData, setResearchAreasData] = useState([]);
   const [years, setYears] = useState([]);
   const [citations, setCitations] = useState([]);
@@ -35,6 +40,11 @@ function Home() {
         console.log(data)
         setMembers(data);
 
+        const projectsResponse = await fetch(`http://localhost:8080/project/?page=${pageProject}&size=10&sortOrder=${sortOrderProject}&sortBy=${sortByProject}`);
+        const projectsData = await projectsResponse.json();
+        setProjects(projectsData.content);
+        setMaxPageProject(projectsData.totalPages);
+        
         const citationsResponse = await fetch(`http://localhost:8080/citation/`);
         let citations = await citationsResponse.json();
         setYears(citations.years.map(year => new Date(year, 0, 1)));
@@ -58,7 +68,8 @@ function Home() {
 
     fetchData();
     fetchResearchAreas();
-  }, [page, size, sortBy, sortOrder]);
+  }, [page, size,sortBy, sortOrder, sortByProject, sortOrderProject, pageProject]);
+
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -70,6 +81,16 @@ function Home() {
   const handlePrevPage = () => {
     if (page > 0) {
       setPage(page - 1);
+    }
+  };
+
+  const handleNextPageProject = () => {
+    setPageProject(page + 1);
+  };
+
+  const handlePrevPageProject = () => {
+    if (page > 0) {
+      setPageProject(page - 1);
     }
   };
 
@@ -135,6 +156,68 @@ function Home() {
     return pageNumbers;
   };
 
+  const renderPageNumbersProject = () => {
+    const pageNumbers = [];
+    if (maxPageProject <= 5) {
+      for (let i = 0; i < maxPageProject; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => setPageProject(i)}
+            className={i === pageProject ? 'active-page' : ''}
+            style={{ margin: '0 5px' }}
+          >
+            {i + 1}
+          </button>
+        );
+      }
+    } else {
+      pageNumbers.push(
+        <button
+          key={0}
+          onClick={() => setPageProject(0)}
+          className={pageProject === 0 ? 'active-page' : ''}
+          style={{ margin: '0 5px' }}
+        >
+          1
+        </button>
+      );
+
+      if (pageProject > 2) {
+        pageNumbers.push(<span key="left-ellipsis">...</span>);
+      }
+
+      for (let i = Math.max(1, pageProject - 1); i <= Math.min(maxPageProject - 2, pageProject + 1); i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => setPageProject(i)}
+            className={i === pageProject ? 'active-page' : ''}
+            style={{ margin: '0 5px' }}
+          >
+            {i + 1}
+          </button>
+        );
+      }
+
+      if (pageProject < maxPageProject - 3) {
+        pageNumbers.push(<span key="right-ellipsis">...</span>);
+      }
+
+      pageNumbers.push(
+        <button
+          key={maxPageProject - 1}
+          onClick={() => setPage(maxPageProject - 1)}
+          className={pageProject === maxPageProject - 1 ? 'active-page' : ''}
+          style={{ margin: '0 5px' }}
+        >
+          {maxPageProject}
+        </button>
+      );
+    }
+    return pageNumbers;
+  };
+
 
   const handleSortByChange = (event) => {
     setSortBy(event.target.value);
@@ -144,7 +227,15 @@ function Home() {
     setSortOrder(event.target.value);
   };
 
-  return (
+  const handleSortByChangeProject = (event) => {
+    setSortByProject(event.target.value);
+  };
+  
+  const handleSortOrderChangeProject = (event) => {
+    setSortOrderProject(event.target.value);
+  };
+
+return (
     <div className="App">
       <div className='charts' style={{ display: 'flex' }}>
         <div className='chart'>
@@ -267,20 +358,59 @@ function Home() {
           </div>
         </>
       )}
-      {activeTab === 'Faculty Members' && (
-        <div className='members'>
-          {members.map(department => (
-            <div key={department.department.departmentId}>
-              <div className='department'>
-                <h1>{department.department.departmentName}</h1>
-                <HorizontalScroll items={department.members} /> { }
+     {activeTab === 'Faculty Members' && (
+              <div>
+                {members.map(department => (
+                <div key={department.department.departmentId}>
+                  <div className='department'>
+                    <h1>{department.department.departmentName}</h1>
+                    <HorizontalScroll items={department.members} /> {}
+                  </div>  
+                </div>
+              ))}
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+            )}
+            {activeTab === 'Projects' && (
+            <>
+            <div className="sort-options">
+                <select id="sortByProject" value={sortByProject} onChange={handleSortByChangeProject}>
+                  <option value="EndDate">End Date</option>
+                </select>
 
+                <select id="sortOrder" value={sortOrderProject} onChange={handleSortOrderChangeProject}>
+                  <option value="ASC">Ascending</option>
+                  <option value="DESC">Descending</option>
+                </select>
+              </div>
+              <ul className='projects'>
+              {projects.map(project => (
+                  project && project.project ? (
+                  <li key={project.project.projectId}>
+                    <div>
+                      <a href={project.project.link} className="project-title">{project.project.projectName}</a>
+                      <p className="author-info"> {project.authorNames.join(', ')}</p>
+                      <p className="end-date">End Date: {new Date(project.project.endDate).toLocaleDateString()}</p>
+                    </div>
+                  </li>
+                  ):null
+                ))}
+              </ul>
+              {/* Pagination controls */}
+              <div className="pagination-buttons">
+                <button onClick={handlePrevPageProject} disabled={pageProject === 0} style={{ marginLeft: '35%' }}>
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
+                {renderPageNumbersProject()}
+                <button onClick={handleNextPageProject} disabled={pageProject === (maxPageProject - 1)}>
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </button>
+              </div>
+            </>
+          )}
+
+            
+        </div>
+        
 
   );
 }

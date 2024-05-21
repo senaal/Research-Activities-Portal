@@ -100,3 +100,9 @@ a {
     border-radius: 100px;
 
   }
+  .projects a{
+    color:#000000;
+    font-weight: bold;
+    font-size:20px;
+  
+  }
