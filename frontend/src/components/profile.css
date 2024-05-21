@@ -121,6 +121,7 @@
 
   .main-content a {
     color:#000000;
+
   }
 
   .main-content li {
@@ -257,6 +258,15 @@
   margin-right: 20px;
   padding: 5px;
   font-size: 14px;
+}
+
+
+
+.projects a{
+  color:#000000;
+  font-weight: bold;
+  font-size:20px;
+
 }
 
 

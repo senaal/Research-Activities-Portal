@@ -1,22 +1,12 @@
 package com.uni.research_portal.controller;
 
 
-import com.uni.research_portal.dto.ArticleWithAllAuthors;
 import com.uni.research_portal.dto.ArticleWithAuthorsDto;
-import com.uni.research_portal.dto.DepartmentArticlesDto;
-import com.uni.research_portal.model.Department;
-import com.uni.research_portal.model.ScientificArticle;
-import com.uni.research_portal.service.FacultyMemberService;
 import com.uni.research_portal.service.ScientificArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("article")
