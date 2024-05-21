@@ -68,4 +68,15 @@ public class ScientificArticleController {
         int pageSize = size != null ? size : 10;
         return scientificArticleService.getArticlesByFaculty(id,sortBy,sortOrder,pageNum,pageSize);
     }
+
+    @GetMapping("/search")
+    public Page<ArticleWithAuthorsDto> searchArticlesByTitle(@RequestParam String title,
+                                                             @RequestParam(defaultValue = "publicationDate") String sortBy,
+                                                             @RequestParam(defaultValue = "DESC") String sortOrder,
+                                                             @RequestParam(required = false) Integer page,
+                                                             @RequestParam(required = false) Integer size) {
+        int pageNum = page != null ? page : 0;
+        int pageSize = size != null ? size : 10;
+        return scientificArticleService.searchScientificArticlesByTitle(title, sortBy, sortOrder, pageNum, pageSize);
+    }
 }

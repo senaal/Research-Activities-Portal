@@ -424,5 +424,35 @@ public class ScientificArticleService {
             }).orElse(null);
         });
     }
+
+    public Page<ArticleWithAuthorsDto> searchScientificArticlesByTitle(String title, String sortBy, String sortOrder, int pageNumber, int pageSize) {
+        Sort.Direction direction = Sort.Direction.fromString(sortOrder);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
+        Page<ScientificArticle> articleAuthorsPage = scientificArticleRepository.findByArticleTitleContainingIgnoreCase(title, pageable);
+
+        return articleAuthorsPage.map(articleDto -> {
+            List<ArticleAuthor> authorIds = articleAuthorRepository.findByScientificArticle(articleDto);
+            List<String> authorNames = new ArrayList<>();
+
+            for (ArticleAuthor auth : authorIds) {
+                String memberName;
+                if (auth.getIsFacultyMember()) {
+                    memberName = facultyMemberRepository.findByAuthorIdAndIsDeletedFalse(auth.getAuthorId()).get().getAuthorName();
+                } else {
+                    memberName = externalFacultyMemberRepository.findByExternalAuthorId(auth.getAuthorId()).getAuthorName();
+                }
+                authorNames.add(memberName);
+            }
+
+            Optional<ScientificArticle> article = scientificArticleRepository.findByArticleIdAndIsRejectedFalse(articleDto.getArticleId());
+
+            return article.map(articleObj -> {
+                ArticleWithAuthorsDto articleDTO = new ArticleWithAuthorsDto();
+                articleDTO.setArticle(articleObj);
+                articleDTO.setAuthorNames(authorNames);
+                return articleDTO;
+            }).orElse(null);
+        });
+    }
 }
 
