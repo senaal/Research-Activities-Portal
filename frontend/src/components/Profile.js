@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import PieChart from './PieChart';
 import './profile.css';
-import Tabs from './Tabs'; 
+import Tabs from './Tabs';
 
 
 
@@ -18,7 +18,7 @@ const Profile = () => {
   const [size, setSize] = useState(10);
   const [sortBy, setSortBy] = useState('publicationDate');
   const [sortOrder, setSortOrder] = useState('DESC');
-  const [activeTab, setActiveTab] = useState('Scientific Articles'); 
+  const [activeTab, setActiveTab] = useState('Scientific Articles');
   const [years, setYears] = useState([]);
   const [citations, setCitations] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -26,6 +26,8 @@ const Profile = () => {
   const [pageProject, setPageProject] = useState(0);
   const [sortByProject, setSortByProject] = useState('endDate');
   const [sortOrderProject, setSortOrderProject] = useState('DESC');
+  const [works, setWorks] = useState([]);
+
 
 
   const { id } = useParams();
@@ -49,8 +51,9 @@ const Profile = () => {
 
         const citationsResponse = await fetch(`http://localhost:8080/citation/${id}`);
         let citations = await citationsResponse.json();
-        setYears(citations.years.map(year => new Date(year, 0, 1))); 
+        setYears(citations.years.map(year => new Date(year, 0, 1)));
         setCitations(citations.citations);
+        setWorks(citations.worksCount);
 
         const projectsResponse = await fetch(`http://localhost:8080/project/author/${id}?page=${pageProject}&size=10&sortOrder=${sortOrderProject}&sortBy=${sortByProject}`);
         const projectsData = await projectsResponse.json();
@@ -92,7 +95,7 @@ const Profile = () => {
   const handleSortByChange = (event) => {
     setSortBy(event.target.value);
   };
-  
+
   const handleSortOrderChange = (event) => {
     setSortOrder(event.target.value);
   };
@@ -277,36 +280,81 @@ const Profile = () => {
       </div>
       <div className="author-header" style={{ marginLeft: '20px', flex: 2 }}>
         <div className='charts' style={{ display: 'flex' }}>
-
           <div className='chart'>
-          <h2 style={{ textAlign: 'center' }}>Research Areas</h2>
-          <ResponsiveContainer width="100%" height={300}>
+            <h2>Scientific Articles</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={years.map((year, index) => ({ year, works: works[index] }))}>
+                <XAxis
+                  dataKey="year"
+                  tickFormatter={(tick) => new Date(tick).getFullYear()}
+                  tick={{ fontSize: 10, angle: -45, textAnchor: 'end' }}
+                  interval={0}
+                />
+                <YAxis
+                  label={{ value: 'Articles', angle: -90, position: 'insideLeft' }}
+                />
+                <Tooltip
+                  labelFormatter={(value) => `Year: ${new Date(value).getFullYear()}`}
+                  content={({ payload, label }) => {
+                    if (payload && payload.length > 0) {
+                      return (
+                        <div style={{ backgroundColor: '#fff', padding: '5px' }}>
+                          <p>Year: {new Date(label).getFullYear()}</p>
+                          {payload.map((entry, index) => (
+                            <p key={index}>{entry.name.charAt(0).toUpperCase() + entry.name.slice(1)}: {entry.value}</p>
+                          ))}
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Line type="monotone" dataKey="works" stroke="#82ca9d" dot={false} name="Works" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div className='chart'>
+            <h2>Research Areas</h2>
+            <ResponsiveContainer width="100%" height={300}>
               <PieChart data={researchAreasData} />
-     
-          </ResponsiveContainer>
+
+            </ResponsiveContainer>
           </div>
 
           <div className='chart'>
-          <h2 style={{ textAlign: 'center' }}>Citations Over the Years</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={years.map((year, index) => ({ year, citations: citations[index] }))}>
-              <XAxis
-                dataKey="year"
-                tickFormatter={(tick) => new Date(tick).getFullYear()}
-                tick={{ fontSize: 10, angle: -45, textAnchor: 'end' }}
-                interval={0}
-              />
-              <YAxis
-                label={{ value: 'Citations', angle: -90, position: 'insideLeft' }}
-              />
-              <Tooltip
-                labelFormatter={(value) => `Year: ${new Date(value).getFullYear()}`} 
-                formatter={(value) => [`Citations: ${value}`, '']} 
-              />
-              <Line type="monotone" dataKey="citations" stroke="#8884d8" dot={false}/>
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+            <h2 >Citations</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={years.map((year, index) => ({ year, citations: citations[index] }))}>
+                <XAxis
+                  dataKey="year"
+                  tickFormatter={(tick) => new Date(tick).getFullYear()}
+                  tick={{ fontSize: 10, angle: -45, textAnchor: 'end' }}
+                  interval={0}
+                />
+                <YAxis
+                  label={{ value: 'Citations', angle: -90, position: 'insideLeft' }}
+                />
+                <Tooltip
+                  labelFormatter={(value) => `Year: ${new Date(value).getFullYear()}`}
+                  content={({ payload, label }) => {
+                    if (payload && payload.length > 0) {
+                      return (
+                        <div style={{ backgroundColor: '#fff', padding: '5px' }}>
+                          <p>Year: {new Date(label).getFullYear()}</p>
+                          {payload.map((entry, index) => (
+                            <p key={index}>{entry.name.charAt(0).toUpperCase() + entry.name.slice(1)}: {entry.value}</p>
+                          ))}
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Line type="monotone" dataKey="citations" stroke="#8884d8" dot={false} name="Citations" />
+                <Line type="monotone" dataKey="works" stroke="#82ca9d" dot={false} name="Works" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
         <div className="content-container" style={{ display: 'flex', flexDirection: 'row', marginTop: '20px' }}>
           <div className="main-content" style={{ flex: 1 }}>
@@ -319,19 +367,19 @@ const Profile = () => {
             </div>
             {activeTab === 'Scientific Articles' && (
               <>
-              <div className="sort-options">
-                <label htmlFor="sortBy"></label>
-                <select id="sortBy" value={sortBy} onChange={handleSortByChange}>
-                  <option value="publicationDate">Publication Date</option>
-                  <option value="citationCount">Citation Count</option>
-                </select>
+                <div className="sort-options">
+                  <label htmlFor="sortBy"></label>
+                  <select id="sortBy" value={sortBy} onChange={handleSortByChange}>
+                    <option value="publicationDate">Publication Date</option>
+                    <option value="citationCount">Citation Count</option>
+                  </select>
 
-                <label htmlFor="sortOrder"> </label>
-                <select id="sortOrder" value={sortOrder} onChange={handleSortOrderChange}>
-                  <option value="ASC">Ascending</option>
-                  <option value="DESC">Descending</option>
-                </select>
-              </div>
+                  <label htmlFor="sortOrder"> </label>
+                  <select id="sortOrder" value={sortOrder} onChange={handleSortOrderChange}>
+                    <option value="ASC">Ascending</option>
+                    <option value="DESC">Descending</option>
+                  </select>
+                </div>
                 <ul>
                   {articles.map(article => (
                     <li key={article.article.articleId}>
@@ -397,6 +445,6 @@ const Profile = () => {
       </div>
     </div>
   );
-};  
+};
 
 export default Profile;
