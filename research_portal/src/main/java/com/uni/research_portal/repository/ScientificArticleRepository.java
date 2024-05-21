@@ -17,24 +17,6 @@ public interface ScientificArticleRepository extends JpaRepository<ScientificArt
     Optional<ScientificArticle> findByDoi(String doi);
 
     Optional<ScientificArticle> findByArticleIdAndIsRejectedFalse(int id);
-
-    @Query("SELECT NEW com.uni.research_portal.dto.DepartmentArticlesDto(sa, CAST(string_agg(fm.authorName, ', ') AS text), d) " +
-            "FROM ScientificArticle sa " +
-            "JOIN ArticleAuthor aa ON sa.articleId = aa.scientificArticle.articleId " +
-            "JOIN FacultyMember fm ON aa.authorId = fm.authorId " +
-            "JOIN Department d ON fm.departmentId.departmentId = d.departmentId " +
-            "WHERE d.departmentId = :departmentId " +
-            "GROUP BY sa.articleId, d.departmentId")
-    List<DepartmentArticlesDto> findByDepartmentId(@Param("departmentId") int departmentId);
-
-    @Query("SELECT new com.uni.research_portal.dto.ExternalFacultyMemberDto(sa, CAST(string_agg(efm.authorName, ', ') AS text)) " +
-            "FROM ScientificArticle sa " +
-            "JOIN ArticleAuthor aa ON sa.articleId = aa.scientificArticle.articleId " +
-            "JOIN ExternalFacultyMember efm ON aa.authorId = efm.externalAuthorId " +
-            "GROUP BY sa.articleId")
-    List<ExternalFacultyMemberDto> findArticlesWithAuthors();
-
-    //@Query("SELECT DISTINCT sa FROM ScientificArticle sa JOIN sa.articleAuthors aa WHERE aa.authorId IN :authorIds")
-    //Page<ScientificArticle> findByAuthorIds(List<Integer> authorIds, Pageable pageable);
+    Page<ScientificArticle> findByArticleTitleContainingIgnoreCase(String title, Pageable page);
 }
 

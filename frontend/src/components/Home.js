@@ -6,6 +6,7 @@ import Tabs from './Tabs';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HorizontalScroll from './HorizontalScroll';
 import BubbleMap from './BubbleMap'; 
+import { Link } from 'react-router-dom';
 
 
 function Home() {
@@ -238,6 +239,12 @@ function Home() {
 
 return (
     <div className="App">
+      <div style={{textAlign:'right', marginRight:'1%'}}>
+      <Link to={`/admin/login`}
+              className='nav-link'>
+              Login as Admin
+          </Link>
+      </div>
       <div className='charts' style={{ display: 'flex' }}>
         <div className='chart'>
           <h2>Scientific Articles</h2>

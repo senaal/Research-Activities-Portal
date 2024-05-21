@@ -1,0 +1,34 @@
+.search-results-page {
+    padding: 20px;
+  }
+  
+  .search-results-page h2 {
+    margin-bottom: 20px;
+  }
+  
+  .search-results-page ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .search-results-page li {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+  }
+  
+  .search-results-page .article-title {
+    font-size: 1.2em;
+    color: #000;
+    text-decoration: none;
+  }
+  
+  .search-results-page .article-title:hover {
+    text-decoration: underline;
+  }
+  
+  .search-results-page .author-info,
+  .search-results-page .publication-date {
+    font-size: 0.9em;
+    color: #555;
+  }
+  

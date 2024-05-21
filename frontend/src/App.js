@@ -10,6 +10,8 @@ import Faculty from './components/Faculty';
 import Admin from './components/Admin';
 import Login from './components/Login';
 import BubbleMap from './components/BubbleMap';
+import SearchResults from './components/SearchResults';
+
 
 export default function App() {
   return (
@@ -25,6 +27,7 @@ export default function App() {
       <Route className="admin" path="/admin" element={<Admin/>} />
       <Route className="adminlogin" path="/admin/login" element={<Login/>} />
       <Route className="bubblemap" path="/bubblemap" element={<BubbleMap/>} />
+      <Route path="/search/:query" element={<SearchResults />} />
       </Routes>
     </BrowserRouter>
   );
