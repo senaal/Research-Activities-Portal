@@ -378,12 +378,15 @@ const Department = ({ departments }) => {
         </>
       )}
       {activeTab === 'Faculty Members' && (
-        <div className='members'>
-          {members.map(department => (
-            <div key={department.department.departmentId}>
-              <div className='department'>
-                <h1>{department.department.departmentName}</h1>
-                <HorizontalScroll items={department.members} /> { }
+              <div>
+                {members.map(department => (
+                <div key={department.department.departmentId}>
+                  <div className='department'>
+                    <h1>{department.department.departmentName}</h1>
+                    <HorizontalScroll items={department.members} /> {}
+                  </div>  
+                </div>
+              ))}
               </div>
             )}
             {activeTab === 'Projects' && (
@@ -423,10 +426,7 @@ const Department = ({ departments }) => {
               </div>
             </>
           )}
-
         </div>
-      )}
-    </div>
   );
 };
 
