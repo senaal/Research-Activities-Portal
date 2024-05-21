@@ -9,6 +9,8 @@ import Article from './components/Articles';
 import Faculty from './components/Faculty';
 import Admin from './components/Admin';
 import Login from './components/Login';
+import SearchResults from './components/SearchResults';
+
 
 export default function App() {
   return (
@@ -23,6 +25,7 @@ export default function App() {
       <Route className="articles" path="/scientific-articles" element={<Article/>} />
       <Route className="admin" path="/admin" element={<Admin/>} />
       <Route className="adminlogin" path="/admin/login" element={<Login/>} />
+      <Route path="/search/:query" element={<SearchResults />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
 import logo from './photos/photo.jpeg';
 import './navbar.css';
@@ -19,7 +19,7 @@ const SearchBar = ({ onSearch }) => {
   return (
     <form onSubmit={handleSubmit}>
       <input
-        placeholder='Search'
+        placeholder='Search Articles'
         value={query}
         onChange={handleChange}
       />
@@ -35,6 +35,8 @@ function Navbar() {
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [faculties, setFaculties] = useState([]);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -45,7 +47,6 @@ function Navbar() {
         const facultyResponse = await fetch('http://localhost:8080/faculty/');
         const facultiesData = await facultyResponse.json();
         setFaculties(facultiesData);
-
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -53,6 +54,14 @@ function Navbar() {
 
     fetchData();
   }, []);
+
+  const handleSearch = (query) => {
+    if (query.trim() === '') {
+      navigate('/');
+    } else {
+      navigate(`/search/${query}`);
+    }
+  };
 
   return (
     <div>
@@ -113,7 +122,7 @@ function Navbar() {
         </div>
 
         <div className='nav-box'>
-          <SearchBar />          
+          <SearchBar onSearch={handleSearch} />
         </div>
       </nav>
     </div>
