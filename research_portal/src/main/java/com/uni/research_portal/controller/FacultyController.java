@@ -1,6 +1,7 @@
 package com.uni.research_portal.controller;
 
 import com.uni.research_portal.dto.CreateFacultyDto;
+import com.uni.research_portal.dto.InstitutionDto;
 import com.uni.research_portal.dto.ResearchAreaDto;
 import com.uni.research_portal.model.Faculty;
 import com.uni.research_portal.service.FacultyService;
@@ -55,6 +56,11 @@ public class FacultyController {
     @GetMapping("/research-area/")
     public List<ResearchAreaDto> getAreas(){
         return facultyService.getResearchAreasUniversity();
+    }
+
+    @GetMapping("/institutions")
+    public List<InstitutionDto> getInstitutions() {
+        return facultyService.getInstitutions();
     }
 
 

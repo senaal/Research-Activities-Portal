@@ -43,6 +43,10 @@ public class ScientificArticleService {
     @Autowired
     DepartmentRepository departmentRepository;
 
+    @Autowired
+    InstitutionRepository institutionRepository;
+
+
 
     @Autowired
     ScientificArticleLogsRepostory scientificArticleLogsRepostory;
@@ -110,7 +114,26 @@ public class ScientificArticleService {
                                             newExtMember.setAuthorName(authorNode.get("author").get("display_name").asText());
                                             JsonNode affNode = authorNode.get("institutions");
                                             if(!affNode.isEmpty()) {
-                                                newExtMember.setAffiliation(affNode.get(0).get("display_name").asText());
+                                                String ror = affNode.get(0).get("ror").asText();
+                                                Institution inst = institutionRepository.findByRor(ror);
+                                                if(inst == null){
+                                                    String urlInstPage = "https://api.openalex.org/institutions/ror:" + ror;
+                                                    UriComponentsBuilder uriInstBuilder = UriComponentsBuilder.fromUriString(urlInstPage);
+                                                    String urlInstWithParam = uriInstBuilder.toUriString();
+                                                    ResponseEntity<String> responseInst = restTemplate.exchange(urlInstWithParam, HttpMethod.GET, HttpEntity.EMPTY, String.class);
+                                                    String responseBodyInst = responseInst.getBody();
+                                                    ObjectMapper objectMapperInst = new ObjectMapper();
+                                                    JsonNode jsonNodeInst = objectMapperInst.readTree(responseBodyInst);
+                                                    Institution newInst = new Institution(jsonNodeInst.get("display_name").asText(),jsonNodeInst.get("geo").get("latitude").asDouble(),jsonNodeInst.get("geo").get("longitude").asDouble(),ror);
+                                                    institutionRepository.save(newInst);
+                                                    newExtMember.setInstitutionId(newInst);
+                                                }else{
+                                                    newExtMember.setInstitutionId(inst);
+                                                }
+                                            }else{
+                                                Institution inst1 = institutionRepository.findById(1).get();
+                                                newExtMember.setInstitutionId(inst1);
+
                                             }
                                             externalFacultyMemberRepository.save(newExtMember);
                                             articleAuthor.setIsFacultyMember(false);
@@ -215,7 +238,9 @@ public class ScientificArticleService {
                                             JsonNode jsonNodeAuthor= objectMapperAuthor.readTree(responseBodyAuthor);
                                             if (jsonNodeAuthor != null) {
                                                 if(!jsonNodeAuthor.get("affiliations").isEmpty()){
-                                                    newExtMember.setAffiliation(jsonNodeAuthor.get("affiliations").get(0).asText());
+                                                    Institution inst1 = institutionRepository.findById(1).get();
+                                                    newExtMember.setInstitutionId(inst1);
+
                                                 }
                                             }
                                             externalFacultyMemberRepository.save(newExtMember);

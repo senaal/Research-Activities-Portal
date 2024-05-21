@@ -5,6 +5,7 @@ import PieChart from './PieChart';
 import Tabs from './Tabs';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HorizontalScroll from './HorizontalScroll';
+import BubbleMap from './BubbleMap'; 
 
 
 function Home() {
@@ -318,7 +319,7 @@ return (
       </div>
 
       <Tabs
-        tabs={['Scientific Articles', 'Projects', 'Faculty Members']}
+        tabs={['Scientific Articles', 'Projects', 'Faculty Members','Works Count-University Map']}
         defaultTab="Scientific Articles"
         onTabChange={handleTabChange}
       />
@@ -407,8 +408,9 @@ return (
               </div>
             </>
           )}
-
-            
+          {activeTab === 'Works Count-University Map' && ( 
+            <BubbleMap />
+          )}
         </div>
         
 

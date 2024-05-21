@@ -20,8 +20,10 @@ public class ExternalFacultyMember {
     @Column
     private String authorName;
 
-    @Column
-    private String affiliation;
+    @ManyToOne
+    @JoinColumn(name = "institution_id", referencedColumnName = "institution_id")
+    private Institution institutionId;
+
     @Column
     private int semanticId;
     @Column(name="open_alex_id")

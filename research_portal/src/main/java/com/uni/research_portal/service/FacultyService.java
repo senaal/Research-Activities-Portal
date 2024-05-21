@@ -1,10 +1,8 @@
 package com.uni.research_portal.service;
 
+import com.uni.research_portal.dto.InstitutionDto;
 import com.uni.research_portal.dto.ResearchAreaDto;
-import com.uni.research_portal.model.Department;
-import com.uni.research_portal.model.Faculty;
-import com.uni.research_portal.model.FacultyMember;
-import com.uni.research_portal.model.ResearchAreaAuthor;
+import com.uni.research_portal.model.*;
 import com.uni.research_portal.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,6 +36,15 @@ public class FacultyService {
     AdminRepository adminRepository;
     @Autowired
     ResearchAreaAuthorRepository researchAreaAuthorRepository;
+
+    @Autowired
+    InstitutionRepository institutionRepository;
+
+    @Autowired
+    ArticleAuthorRepository articleAuthorRepository;
+
+    @Autowired
+    ExternalFacultyMemberRepository externalFacultyMemberRepository;
 
     public Faculty createFaculty(String name, String token){
         if (adminRepository.countByEmail(extractSubject(token))>0){
@@ -133,6 +140,33 @@ public class FacultyService {
             return response.subList(0, 10);
         }
         return response;
+    }
+
+    public List<InstitutionDto> getInstitutions() {
+        List<Institution> institutions = institutionRepository.findAll();
+
+        List<ExternalFacultyMember> externalFacultyMembers = externalFacultyMemberRepository.findAll();
+
+        Map<Integer, Long> articleCounts = articleAuthorRepository.findAll().stream()
+                .filter(articleAuthor -> !articleAuthor.getIsFacultyMember())
+                .collect(Collectors.groupingBy(ArticleAuthor::getAuthorId, Collectors.counting()));
+
+        Map<Integer, Long> institutionCounts = externalFacultyMembers.stream()
+                .filter(member -> member.getInstitutionId() != null) // Filter out members with null institutionId
+                .collect(Collectors.groupingBy(
+                        member -> member.getInstitutionId().getInstitutionId(),
+                        Collectors.summingLong(member -> articleCounts.getOrDefault(member.getExternalAuthorId(), 0L))
+                ));
+
+        return institutions.stream()
+                .map(institution -> new InstitutionDto(
+                        institution.getInstitutionId(),
+                        institution.getName(),
+                        institution.getXCoordinate(),
+                        institution.getYCoordinate(),
+                        institutionCounts.getOrDefault(institution.getInstitutionId(), 0L).intValue()
+                ))
+                .collect(Collectors.toList());
     }
 
 }
