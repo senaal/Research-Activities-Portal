@@ -31,4 +31,10 @@ public class CitationController {
     public Map<String, List<Integer>> facultyCitationResponse(@PathVariable int id){
         return citationService.getStatisticsByFacultyId(id);
     }
+
+    @GetMapping("/")
+    public Map<String, List<Integer>> allCitationResponse(){
+        return citationService.getAllStatistics();
+    }
 }
+

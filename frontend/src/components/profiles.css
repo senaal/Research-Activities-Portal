@@ -1,8 +1,34 @@
 .scroll-container {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: scroll; /* Force horizontal scrollbar to be always visible */
   white-space: nowrap; 
-  height: 240px; 
+  height: 240px;
+  position: relative; /* Add this to make the pseudo-element work */
+}
+
+.scroll-container::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none; 
+}
+
+.scroll-container::-webkit-scrollbar {
+  height: 12px; 
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: white; 
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #888; 
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
 }
 
 .scroll-item {
@@ -16,14 +42,14 @@
 
 .scroll-item p {
   text-align: center;
-  font-weight:bold ;
+  font-weight: bold;
 }
 
 .scroll-item img {
   align-items: center;
 }
 
-.department h1{
+.department h1 {
   font-size: 20px;
   font-weight: bold;
   color: #000000;
@@ -41,4 +67,8 @@
 
 .scroll-item:hover {
   background-color: #a9aaac;
+}
+
+.members{
+  margin-left: 1%;
 }
