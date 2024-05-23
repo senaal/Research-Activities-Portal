@@ -1,6 +1,8 @@
 package com.uni.research_portal.controller;
 
+import com.uni.research_portal.dto.CountryArticleCountDto;
 import com.uni.research_portal.dto.CreateDepartmentDto;
+import com.uni.research_portal.dto.InstitutionDto;
 import com.uni.research_portal.dto.ResearchAreaDto;
 import com.uni.research_portal.model.Department;
 import com.uni.research_portal.service.DepartmentService;
@@ -51,5 +53,14 @@ public class DepartmentController {
         return departmentService.getResearchAreas(id);
     }
 
+    @GetMapping("/{id}/institutions")
+    public List<InstitutionDto> getInstitutions(@PathVariable int id){
+        return departmentService.getInstitutions(id);
+    }
+
+    @GetMapping("/{id}/country")
+    public List<CountryArticleCountDto> getCountries(@PathVariable int id){
+        return departmentService.getTotalArticlesAndAverageCoordinatesByCountry(id);
+    }
 
 }

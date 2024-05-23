@@ -1,10 +1,10 @@
 package com.uni.research_portal.service;
 
-import com.uni.research_portal.dto.CreateDepartmentDto;
-import com.uni.research_portal.dto.ResearchAreaDto;
+import com.uni.research_portal.dto.*;
 import com.uni.research_portal.model.*;
 import com.uni.research_portal.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,10 +12,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.uni.research_portal.util.Jwt.extractSubject;
@@ -42,6 +39,18 @@ public class DepartmentService {
 
     @Autowired
     ResearchAreaAuthorRepository researchAreaAuthorRepository;
+
+    @Autowired
+    InstitutionRepository institutionRepository;
+
+    @Autowired
+    ArticleAuthorRepository articleAuthorRepository;
+
+    @Autowired
+    ScientificArticleRepository scientificArticleRepository;
+
+    @Autowired
+    ExternalFacultyMemberRepository externalFacultyMemberRepository;
 
 
 
@@ -84,7 +93,6 @@ public class DepartmentService {
                 ));
 
         List<ResearchAreaDto> response = new ArrayList<>();
-        List<ResearchAreaDto> finalResponse = response;
         researchAreaCountMap.forEach((researchAreaId, count) -> {
 
             String fingerprintName = researchAreaAuthors.stream()
@@ -106,6 +114,116 @@ public class DepartmentService {
             return response.subList(0, 10);
         }
         return response;
+    }
+
+    public List<InstitutionDto> getInstitutions(int departmentId) {
+
+        List<FacultyMember> facultyMembers = facultyMemberRepository.findByDepartmentIdDepartmentId(departmentId);
+        List<Integer> facultyMemberIds = new ArrayList<>();
+        for (FacultyMember fm: facultyMembers){
+            facultyMemberIds.add(fm.getAuthorId());
+        }
+        List<ArticleAuthor> articleAuthorsPage = articleAuthorRepository.findByIsFacultyMemberTrueAndAuthorIdIn(facultyMemberIds);
+        Set<ScientificArticle> scientificArticles = articleAuthorsPage.stream()
+                .map(ArticleAuthor::getScientificArticle)
+                .collect(Collectors.toSet());
+
+        List<ArticleAuthor> articleAuthors = articleAuthorRepository.findByIsFacultyMemberFalseAndScientificArticleIn(scientificArticles);
+        List<Integer> externalFacultyMemberIds = articleAuthors.stream()
+                .map(ArticleAuthor::getAuthorId)
+                .collect(Collectors.toList());
+
+        List<ExternalFacultyMember> members = externalFacultyMemberRepository.findByExternalAuthorIdIn(externalFacultyMemberIds);
+
+        Map<Integer, Long> articleCounts = articleAuthors.stream()
+                .collect(Collectors.groupingBy(ArticleAuthor::getAuthorId, Collectors.counting()));
+
+        Map<Integer, Long> institutionCounts = members.stream()
+            .filter(member -> member.getInstitutionId() != null) // Filter out members with null institutionId
+            .collect(Collectors.groupingBy(
+                    member -> member.getInstitutionId().getInstitutionId(),
+                    Collectors.summingLong(member -> articleCounts.getOrDefault(member.getExternalAuthorId(), 0L))
+            ));
+
+
+        List<Institution> institutions = members.stream()
+                .map(ExternalFacultyMember::getInstitutionId)
+                .filter(institutionId -> institutionId != null)
+                .toList();
+
+
+        return institutions.stream()
+                .map(institution -> new InstitutionDto(
+                        institution.getInstitutionId(),
+                        institution.getName(),
+                        institution.getCountry(),
+                        institution.getXCoordinate(),
+                        institution.getYCoordinate(),
+                        institutionCounts.getOrDefault(institution.getInstitutionId(), 0L).intValue()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
+    public List<CountryArticleCountDto> getTotalArticlesAndAverageCoordinatesByCountry(int departmentId) {
+        List<FacultyMember> facultyMembers = facultyMemberRepository.findByDepartmentIdDepartmentId(departmentId);
+        List<Integer> facultyMemberIds = new ArrayList<>();
+        for (FacultyMember fm: facultyMembers){
+            facultyMemberIds.add(fm.getAuthorId());
+        }
+        List<ArticleAuthor> articleAuthorsPage = articleAuthorRepository.findByIsFacultyMemberTrueAndAuthorIdIn(facultyMemberIds);
+        Set<ScientificArticle> scientificArticles = articleAuthorsPage.stream()
+                .map(ArticleAuthor::getScientificArticle)
+                .collect(Collectors.toSet());
+
+        List<ArticleAuthor> articleAuthors = articleAuthorRepository.findByIsFacultyMemberFalseAndScientificArticleIn(scientificArticles);
+        List<Integer> externalFacultyMemberIds = articleAuthors.stream()
+                .map(ArticleAuthor::getAuthorId)
+                .collect(Collectors.toList());
+
+        List<ExternalFacultyMember> members = externalFacultyMemberRepository.findByExternalAuthorIdIn(externalFacultyMemberIds);
+
+        Map<Integer, Long> articleCounts = articleAuthors.stream()
+                .collect(Collectors.groupingBy(ArticleAuthor::getAuthorId, Collectors.counting()));
+
+        Map<Integer, Long> institutionCounts = members.stream()
+                .filter(member -> member.getInstitutionId() != null) // Filter out members with null institutionId
+                .collect(Collectors.groupingBy(
+                        member -> member.getInstitutionId().getInstitutionId(),
+                        Collectors.summingLong(member -> articleCounts.getOrDefault(member.getExternalAuthorId(), 0L))
+                ));
+
+
+        List<Institution> institutions = members.stream()
+                .map(ExternalFacultyMember::getInstitutionId)
+                .filter(institutionId -> institutionId != null)
+                .toList();
+
+        Map<String, CountryStatistics> countryStatisticsMap = new HashMap<>();
+
+        for (Institution institution : institutions) {
+            String country = institution.getCountry();
+            Long articleCount = institutionCounts.getOrDefault(institution.getInstitutionId(), 0L);
+
+            countryStatisticsMap.computeIfAbsent(country, k -> new CountryStatistics()).addInstitution(
+                    institution.getXCoordinate(),
+                    institution.getYCoordinate(),
+                    articleCount
+            );
+        }
+
+        return countryStatisticsMap.entrySet().stream()
+                .map(entry -> {
+                    String country = entry.getKey();
+                    CountryStatistics stats = entry.getValue();
+                    return new CountryArticleCountDto(
+                            country,
+                            stats.getTotalArticles(),
+                            stats.getAverageLatitude(),
+                            stats.getAverageLongitude()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
 
