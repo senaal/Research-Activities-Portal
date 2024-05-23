@@ -28,7 +28,7 @@ public class ScientificArticle {
     @Column(name = "doi")
     private String doi;
 
-    @Column(name = "article_title")
+    @Column(name = "article_title", length = 1024)
     private String articleTitle;
 
     @Column(name = "publication_date")

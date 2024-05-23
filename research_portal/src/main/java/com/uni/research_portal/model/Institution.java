@@ -24,10 +24,12 @@ public class Institution {
 
     private String ror;
 
-    public Institution(String name, double xCoordinate, double yCoordinate, String ror) {
+    private String country;
+    public Institution(String name, double xCoordinate, double yCoordinate, String ror, String country) {
         this.name = name;
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.ror = ror;
+        this.country = country;
     }
 }

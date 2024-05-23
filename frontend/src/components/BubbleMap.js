@@ -1,46 +1,63 @@
 import React, { Component } from 'react';
-import { CircleMarker, TileLayer, Tooltip, MapContainer } from "react-leaflet";
+import { CircleMarker, TileLayer, Tooltip, MapContainer, Marker, ZoomControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import MapEventHandler from './MapEventHandler';
 
 class BubbleMap extends Component {
   state = {
+    countries: [],
     institutions: [],
     centerLat: 0,
     centerLong: 0,
     minLat: 90,
     maxLat: -90,
     minLong: 180,
-    maxLong: -180
+    maxLong: -180,
+    zoom: 2,
   };
 
   componentDidMount() {
+    fetch('http://localhost:8080/faculty/institutions-country')
+      .then(response => response.json())
+      .then(data => {
+        this.setCountryData(data);
+      })
+      .catch(error => console.error('Error fetching country data:', error));
+
     fetch('http://localhost:8080/faculty/institutions')
       .then(response => response.json())
       .then(data => {
-        this.setState({ institutions: data }, this.calculateBounds);
+        this.setInstitutionData(data);
       })
-      .catch(error => console.error('Error fetching data:', error));
+      .catch(error => console.error('Error fetching institution data:', error));
   }
 
-  calculateBounds = () => {
-    const { institutions } = this.state;
-    let minLat = 90, maxLat = -90, minLong = 180, maxLong = -180;
 
-    institutions.forEach(institution => {
-      const lat = institution.x;
-      const long = institution.y;
-      if (lat < minLat) minLat = lat;
-      if (lat > maxLat) maxLat = lat;
-      if (long < minLong) minLong = long;
-      if (long > maxLong) maxLong = long;
+
+  setCountryData = (data) => {
+    const { minLat, maxLat, minLong, maxLong } = this.state;
+
+    const updatedMinLat = data.reduce((min, country) => Math.min(min, country.averageLatitude), minLat);
+    const updatedMaxLat = data.reduce((max, country) => Math.max(max, country.averageLatitude), maxLat);
+    const updatedMinLong = data.reduce((min, country) => Math.min(min, country.averageLongitude), minLong);
+    const updatedMaxLong = data.reduce((max, country) => Math.max(max, country.averageLongitude), maxLong);
+
+    const updatedCenterLat = (updatedMinLat + updatedMaxLat) / 2;
+    const updatedCenterLong = (updatedMinLong + updatedMaxLong) / 2;
+
+    this.setState({
+      countries: data,
+      centerLat: updatedCenterLat,
+      centerLong: updatedCenterLong,
+      minLat: updatedMinLat,
+      maxLat: updatedMaxLat,
+      minLong: updatedMinLong,
+      maxLong: updatedMaxLong,
     });
+  };
 
-    const centerLat = (minLat + maxLat) / 2;
-    const centerLong = (minLong + maxLong) / 2;
-    const bufferLat = (maxLat - minLat) * 0.05;
-    const bufferLong = (maxLong - minLong) * 0.05;
-
-    this.setState({ centerLat, centerLong, minLat, maxLat, minLong, maxLong, bufferLat, bufferLong });
+  setInstitutionData = (data) => {
+    this.setState({ institutions: data });
   };
 
   getColor = (articleCount) => {
@@ -51,40 +68,62 @@ class BubbleMap extends Component {
     return "#2a2a78";
   };
 
-  render() {
-    const { institutions, centerLat, centerLong, minLat, maxLat, minLong, maxLong, bufferLat, bufferLong } = this.state;
+  
 
+  handleZoomEnd = (zoomLevel) => {
+    this.setState({ zoom: zoomLevel });
+  };
+
+  render() {
+    const { countries, institutions, centerLat, centerLong, minLat, maxLat, minLong, maxLong, zoom } = this.state;
     return (
       <div>
         <h3 style={{ textAlign: "center" }}>Work Counts With Universities</h3>
         <MapContainer
           style={{ height: "480px", width: "100%" }}
-          zoom={2}
+          zoom={zoom}
           center={[centerLat, centerLong]}
           bounds={[
-            [minLat - bufferLat, minLong - bufferLong],
-            [maxLat + bufferLat, maxLong + bufferLong]
+            [minLat, minLong],
+            [maxLat, maxLong]
           ]}
+          zoomControl={false}
         >
+          <ZoomControl position="topright" />
           <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <MapEventHandler onZoomEnd={this.handleZoomEnd} />
 
-          {institutions.map((institution, k) => {
-            if (institution.x === null || institution.y === null || institution.institutionId === 1) return null;
-            return (
-              <CircleMarker
-                key={k}
-                center={[institution.x, institution.y]}
-                radius={20 * Math.log(institution.articleCount / 10 + 1)}
-                fillOpacity={0.5}
-                fillColor={this.getColor(institution.articleCount)}
-                stroke={false}
-              >
-                <Tooltip direction="right" offset={[-8, -2]} opacity={1}>
-                  <span>{institution.institutionName + ": " + institution.articleCount}</span>
-                </Tooltip>
-              </CircleMarker>
-            )
-          })}
+          {zoom > 3
+            ? institutions.map((institution, k) => (
+                <CircleMarker
+                  key={k}
+                  center={[institution.x, institution.y]}
+                  radius={10 * Math.log(institution.articleCount / 10 + 1)}
+                  fillOpacity={0.5}
+                  fillColor={this.getColor(institution.articleCount)}
+                  stroke={false}
+
+                >
+                  <Tooltip direction="right" offset={[-8, -2]} opacity={1}>
+                    <span>{`${institution.institutionName}: ${institution.articleCount}`}</span>
+                  </Tooltip>
+                </CircleMarker>
+              ))
+            : countries.map((country, k) => (
+                <CircleMarker
+                  key={k}
+                  center={[country.averageLatitude, country.averageLongitude]}
+                  radius={10 * Math.log(country.totalArticles / 10 + 1)}
+                  fillOpacity={0.5}
+                  fillColor={this.getColor(country.totalArticles)}
+                  stroke={false}
+                >
+                  <Tooltip direction="right" offset={[-8, -2]} opacity={1}>
+                    <span>{`${country.country}: ${country.totalArticles}`}</span>
+                  </Tooltip>
+                </CircleMarker>
+              ))
+          }
         </MapContainer>
       </div>
     );
