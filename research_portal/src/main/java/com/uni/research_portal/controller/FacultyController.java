@@ -1,5 +1,6 @@
 package com.uni.research_portal.controller;
 
+import com.uni.research_portal.dto.CountryArticleCountDto;
 import com.uni.research_portal.dto.CreateFacultyDto;
 import com.uni.research_portal.dto.InstitutionDto;
 import com.uni.research_portal.dto.ResearchAreaDto;
@@ -62,6 +63,12 @@ public class FacultyController {
     public List<InstitutionDto> getInstitutions() {
         return facultyService.getInstitutions();
     }
+
+    @GetMapping("/institutions-country")
+    public List<CountryArticleCountDto> getInstitutionsCountry() {
+        return facultyService.getTotalArticlesAndAverageCoordinatesByCountry();
+    }
+
 
 
 }

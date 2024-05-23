@@ -1,5 +1,7 @@
 package com.uni.research_portal.service;
 
+import com.uni.research_portal.dto.CountryArticleCountDto;
+import com.uni.research_portal.dto.CountryStatistics;
 import com.uni.research_portal.dto.InstitutionDto;
 import com.uni.research_portal.dto.ResearchAreaDto;
 import com.uni.research_portal.model.*;
@@ -11,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.uni.research_portal.util.Jwt.extractSubject;
@@ -162,10 +161,65 @@ public class FacultyService {
                 .map(institution -> new InstitutionDto(
                         institution.getInstitutionId(),
                         institution.getName(),
+                        institution.getCountry(),
                         institution.getXCoordinate(),
                         institution.getYCoordinate(),
                         institutionCounts.getOrDefault(institution.getInstitutionId(), 0L).intValue()
                 ))
+                .collect(Collectors.toList());
+    }
+
+
+    public List<CountryArticleCountDto> getTotalArticlesAndAverageCoordinatesByCountry() {
+        // Fetch all institutions
+        List<Institution> institutions = institutionRepository.findAll();
+
+        // Fetch all external faculty members
+        List<ExternalFacultyMember> externalFacultyMembers = externalFacultyMemberRepository.findAll();
+
+        // Fetch all article authors
+        List<ArticleAuthor> articleAuthors = articleAuthorRepository.findAll();
+
+        // Create a map to count articles by authorId (only non-faculty members)
+        Map<Integer, Long> articleCounts = articleAuthors.stream()
+                .filter(articleAuthor -> !articleAuthor.getIsFacultyMember())
+                .collect(Collectors.groupingBy(ArticleAuthor::getAuthorId, Collectors.counting()));
+
+        // Create a map to count articles by institutionId
+        Map<Integer, Long> institutionCounts = externalFacultyMembers.stream()
+                .filter(member -> member.getInstitutionId() != null) // Filter out members with null institutionId
+                .collect(Collectors.groupingBy(
+                        member -> member.getInstitutionId().getInstitutionId(),
+                        Collectors.summingLong(member -> articleCounts.getOrDefault(member.getExternalAuthorId(), 0L))
+                ));
+
+        // Create a map to sum article counts, latitudes, longitudes and counts of institutions by country
+        Map<String, CountryStatistics> countryStatisticsMap = new HashMap<>();
+
+        // Iterate over institutions to populate the map
+        for (Institution institution : institutions) {
+            String country = institution.getCountry();
+            Long articleCount = institutionCounts.getOrDefault(institution.getInstitutionId(), 0L);
+
+            countryStatisticsMap.computeIfAbsent(country, k -> new CountryStatistics()).addInstitution(
+                    institution.getXCoordinate(),
+                    institution.getYCoordinate(),
+                    articleCount
+            );
+        }
+
+        // Convert the result to a list of CountryArticleCountDto
+        return countryStatisticsMap.entrySet().stream()
+                .map(entry -> {
+                    String country = entry.getKey();
+                    CountryStatistics stats = entry.getValue();
+                    return new CountryArticleCountDto(
+                            country,
+                            stats.getTotalArticles(),
+                            stats.getAverageLatitude(),
+                            stats.getAverageLongitude()
+                    );
+                })
                 .collect(Collectors.toList());
     }
 

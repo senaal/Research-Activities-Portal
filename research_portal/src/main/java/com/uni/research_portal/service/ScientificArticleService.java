@@ -124,7 +124,7 @@ public class ScientificArticleService {
                                                     String responseBodyInst = responseInst.getBody();
                                                     ObjectMapper objectMapperInst = new ObjectMapper();
                                                     JsonNode jsonNodeInst = objectMapperInst.readTree(responseBodyInst);
-                                                    Institution newInst = new Institution(jsonNodeInst.get("display_name").asText(),jsonNodeInst.get("geo").get("latitude").asDouble(),jsonNodeInst.get("geo").get("longitude").asDouble(),ror);
+                                                    Institution newInst = new Institution(jsonNodeInst.get("display_name").asText(),jsonNodeInst.get("geo").get("latitude").asDouble(),jsonNodeInst.get("geo").get("longitude").asDouble(),ror,jsonNodeInst.get("geo").get("country").asText() );
                                                     institutionRepository.save(newInst);
                                                     newExtMember.setInstitutionId(newInst);
                                                 }else{

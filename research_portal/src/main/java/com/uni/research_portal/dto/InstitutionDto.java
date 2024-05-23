@@ -12,6 +12,7 @@ import lombok.Setter;
 public class InstitutionDto {
     private int institutionId;
     private String institutionName;
+    private String country;
     private double x;
     private double y;
     private int articleCount;
