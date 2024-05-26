@@ -11,8 +11,6 @@ const Admin = () => {
   const [facultyId, setFacultyId] = useState('');
   const [facultyName, setFacultyName] = useState('');
   const [authorName, setAuthorName] = useState('');
-  const [openAlexId, setOpenAlexId] = useState('');
-  const [semanticId, setSemanticId] = useState('');
   const [authorId, setAuthorId] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -20,8 +18,6 @@ const Admin = () => {
   const [title, setTitle] = useState('');
   const [newdepartmentId, setnewDepartmentId] = useState('');
   const [newauthorName, setnewAuthorName] = useState('');
-  const [newopenAlexId, setnewOpenAlexId] = useState('');
-  const [newsemanticId, setnewSemanticId] = useState('');
   const [newemail, setnewEmail] = useState('');
   const [newphone, setnewPhone] = useState('');
   const [newphoto, setnewPhoto] = useState('');
@@ -173,8 +169,6 @@ const Admin = () => {
           body: JSON.stringify({
             departmentId: newdepartmentId,
             authorName: newauthorName,
-            openAlexId: newopenAlexId,
-            semanticId: newsemanticId,
             email: newemail,
             photo: newphoto,
             title: newtitle,
@@ -187,8 +181,6 @@ const Admin = () => {
         const data = await response.json();
         setnewDepartmentId('');
         setnewAuthorName('');
-        setnewOpenAlexId('');
-        setnewSemanticId('');
         setnewEmail('');
         setnewPhone('');
         setnewPhoto('');
@@ -433,18 +425,6 @@ const Admin = () => {
               value={newauthorName}
               onChange={(e) => setnewAuthorName(e.target.value)}
               placeholder="Enter author name"
-            />
-            <input
-              type="text"
-              value={newopenAlexId}
-              onChange={(e) => setnewOpenAlexId(e.target.value)}
-              placeholder="Enter openAlexId"
-            />
-            <input
-              type="number"
-              value={newsemanticId}
-              onChange={(e) => setnewSemanticId(e.target.value)}
-              placeholder="Enter semanticId"
             />
             <input
               type="text"

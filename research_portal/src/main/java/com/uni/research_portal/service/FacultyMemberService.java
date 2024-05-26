@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uni.research_portal.dto.AuthorInfoDto;
 import com.uni.research_portal.dto.CreateAuthorRequestDto;
 import com.uni.research_portal.dto.DepartmentMembers;
+import com.uni.research_portal.exception.BadRequestException;
 import com.uni.research_portal.model.Citations;
 import com.uni.research_portal.model.Department;
 import com.uni.research_portal.model.FacultyMember;
@@ -25,6 +26,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -183,27 +187,94 @@ public class FacultyMemberService {
         return members;
     }
 
+    public Optional<String> getOpenAlexIdApi(String name) {
+        try {
+            String url = "https://api.openalex.org/authors";
+            String filterValue = "display_name.search:"+name;
+            URI uri = UriComponentsBuilder.fromHttpUrl(url)
+                    .queryParam("filter", filterValue)
+                    .build()
+                    .encode()
+                    .toUri();
+            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, HttpEntity.EMPTY, String.class);
+            String responseBody = response.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                JsonNode jsonNode = objectMapper.readTree(responseBody);
+                if (jsonNode != null) {
+                    JsonNode results = jsonNode.get("results");
+                    if (results.isArray() && !results.isEmpty()) {
+                        JsonNode firstResult = results.get(0);
+                        String openAlexIdUrl = firstResult.get("id").asText();
+                        String openAlexId = openAlexIdUrl.replace("https://openalex.org/", "");
+                        return Optional.of(openAlexId);
+                    } else {
+                        return Optional.empty();
+                    }
+                }
+            }catch(Exception e){
+                new ResponseEntity<>("Check the Request.", HttpStatus.BAD_REQUEST);
+                return Optional.empty();
+            }
+
+        }
+        catch(Exception e){
+            new ResponseEntity<>("Check the Request.", HttpStatus.BAD_REQUEST);
+            return Optional.empty();
+        }
+        return Optional.empty();
+    }
+    public Optional<Integer> getSemanticScholarIdApi(String name) {
+        try {
+            String formattedName = name.replace(" ", "+");
+            String url = "https://api.semanticscholar.org/graph/v1/author/search";
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url)
+                    .queryParam("query", formattedName);
+
+            String urlWithParam = uriBuilder.toUriString();
+            ResponseEntity<String> response = restTemplate.exchange(urlWithParam, HttpMethod.GET, HttpEntity.EMPTY, String.class);
+            String responseBody = response.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode root = objectMapper.readTree(responseBody);
+            JsonNode data = root.path("data");
+            if (data.isArray() && !data.isEmpty()) {
+                JsonNode firstResult = data.get(0);
+                Integer authorId = firstResult.path("authorId").asInt();
+                return Optional.of(authorId);
+            } else {
+                return Optional.empty();
+            }
+
+        } catch (Exception e) {
+            new ResponseEntity<>("Check the Request.", HttpStatus.BAD_REQUEST);
+            return Optional.empty();
+        }
+    }
+
+
     public FacultyMember createFacultyMember(CreateAuthorRequestDto createAuthorRequestDto, String token){
-        if (adminRepository.countByEmail(extractSubject(token))>0){
             Department department = departmentRepository.findByDepartmentId(createAuthorRequestDto.getDepartmentId()).get();
             FacultyMember newMember = new FacultyMember();
             newMember.setDepartmentId(department);
             newMember.setAuthorName(createAuthorRequestDto.getAuthorName());
-            newMember.setOpenAlexId(createAuthorRequestDto.getOpenAlexId());
-            newMember.setSemanticId(createAuthorRequestDto.getSemanticId());
             newMember.setEmail(createAuthorRequestDto.getEmail());
             newMember.setPhone(createAuthorRequestDto.getPhone());
             newMember.setAddress(createAuthorRequestDto.getAddress());
             newMember.setTitle(createAuthorRequestDto.getTitle());
             newMember.setPhoto(createAuthorRequestDto.getPhoto());
-            facultyMemberRepository.save(newMember);
-            FacultyMemberLogs facultyMemberLogs = new FacultyMemberLogs(newMember, "created");
-            facultyMemberLogsRepository.save(facultyMemberLogs);
-            return newMember;
-        }
-        else{
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
-        }
+            Optional<String> openAlex = getOpenAlexIdApi(createAuthorRequestDto.getAuthorName());
+            Optional<Integer> semantic = getSemanticScholarIdApi(createAuthorRequestDto.getAuthorName());
+            if(openAlex.isEmpty() || semantic.isEmpty()){
+                throw new BadRequestException("There is no ID found for provided name!");
+            }
+            else{
+                newMember.setOpenAlexId(openAlex.get());
+                newMember.setSemanticId(semantic.get());
+                facultyMemberRepository.save(newMember);
+                FacultyMemberLogs facultyMemberLogs = new FacultyMemberLogs(newMember, "created");
+                facultyMemberLogsRepository.save(facultyMemberLogs);
+                return newMember;
+            }
     }
 
     public FacultyMember deleteFacultyMember(int id, String token){
