@@ -11,6 +11,7 @@ import Admin from './components/Admin';
 import Login from './components/Login';
 import BubbleMap from './components/BubbleMap';
 import SearchResults from './components/SearchResults';
+import ProfileEdit from './components/ProfileEdit';
 
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
       <Route className="adminlogin" path="/admin/login" element={<Login/>} />
       <Route className="bubblemap" path="/bubblemap" element={<BubbleMap/>} />
       <Route path="/search/:query" element={<SearchResults />} />
+      <Route path="/profile/:id/edit" element={<ProfileEdit />} />
       </Routes>
     </BrowserRouter>
   );

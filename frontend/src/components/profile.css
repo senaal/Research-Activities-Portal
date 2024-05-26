@@ -41,7 +41,6 @@
   .author{
     background-color: #ffffff;
     display: flex; 
-    justify-content: space-between;
   }
 
   .article-title {
@@ -272,6 +271,19 @@
   color:#000000;
   font-weight: bold;
   font-size:20px;
+
+}
+
+.login-button{
+  background-color: #1f357a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+  width: 50px;
+  justify-content: right; 
+  align-items: right;
 
 }
 

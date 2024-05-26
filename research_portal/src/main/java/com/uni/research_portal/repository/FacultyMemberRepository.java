@@ -22,4 +22,5 @@ public interface FacultyMemberRepository extends JpaRepository<FacultyMember, In
     List<FacultyMember> findByDepartmentIdDepartmentId(Integer departmentId);
     FacultyMember findBySemanticId(int id);
 
+    FacultyMember findByEmail(String email);
 }

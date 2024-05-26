@@ -1,10 +1,7 @@
 package com.uni.research_portal.controller;
 
 
-import com.uni.research_portal.dto.AuthorInfoDto;
-import com.uni.research_portal.dto.CreateAuthorRequestDto;
-import com.uni.research_portal.dto.DepartmentMembers;
-import com.uni.research_portal.dto.ResearchAreaDto;
+import com.uni.research_portal.dto.*;
 import com.uni.research_portal.model.FacultyMember;
 import com.uni.research_portal.model.ScientificArticle;
 import com.uni.research_portal.service.FacultyMemberService;
@@ -75,8 +72,10 @@ public class FacultyMemberController {
     @PutMapping("/{id}")
     public FacultyMember putMapping(@RequestBody CreateAuthorRequestDto createAuthorRequestDto, @PathVariable int id,
                                     @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
+        System.out.println(token);
+
         if (validateToken(token.substring(7))) {
-            return facultyMemberService.editFacultyMember(createAuthorRequestDto,id, token);
+            return facultyMemberService.editFacultyMember(createAuthorRequestDto,id, token.substring(7));
         }else{
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
@@ -92,4 +91,13 @@ public class FacultyMemberController {
         return facultyMemberService.getResearchAreas(id);
     }
 
+    @PostMapping("/{id}/sendCode")
+    public String sendCode(@PathVariable int id) {
+        return facultyMemberService.sendCode(id);
+    }
+
+    @PostMapping("/{id}/verify")
+    public VerificationResponseDto verifyCode(@PathVariable int id, @RequestParam String code) {
+        return facultyMemberService.verifyCode(id,code);
+    }
 }
