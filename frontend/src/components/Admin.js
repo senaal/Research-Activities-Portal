@@ -5,8 +5,6 @@ import Tabs from './Tabs';
 import Confirm from './Confirm';
 
 const Admin = () => {
-  const [adminEmail, setAdminEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [departmentName, setDepartmentName] = useState('');
   const [facultyId, setFacultyId] = useState('');
   const [facultyName, setFacultyName] = useState('');
@@ -16,12 +14,14 @@ const Admin = () => {
   const [phone, setPhone] = useState('');
   const [photo, setPhoto] = useState('');
   const [title, setTitle] = useState('');
+  const [address, setAddress] = useState('');
   const [newdepartmentId, setnewDepartmentId] = useState('');
   const [newauthorName, setnewAuthorName] = useState('');
   const [newemail, setnewEmail] = useState('');
   const [newphone, setnewPhone] = useState('');
   const [newphoto, setnewPhoto] = useState('');
   const [newtitle, setnewTitle] = useState('');
+  const [newaddress, setnewAddress] = useState('');
   const [deletedFacultyId, setDeletedFacultyId] = useState('');
   const [deletedDepartmentId, setDeletedDepartmentId] = useState('');
   const [departments, setDepartments] = useState([]);
@@ -173,6 +173,7 @@ const Admin = () => {
             photo: newphoto,
             title: newtitle,
             phone: newphone,
+            address: newaddress,
           }),
         });
         if (!response.ok) {
@@ -185,6 +186,7 @@ const Admin = () => {
         setnewPhone('');
         setnewPhoto('');
         setnewTitle('');
+        setnewAddress('');
         setPopupMessage('Member created successfully!');
       } catch (error) {
         console.error('Error creating member:', error);
@@ -205,9 +207,7 @@ const Admin = () => {
         setPhoto(data.member.photo);
         setPhone(data.member.phone);
         setTitle(data.member.title);
-        setOpenAlexId(data.member.openAlexId);
-        setSemanticId(data.member.semanticId);
-        
+        setAddress(data.member.address);
       })
       .catch(error => console.error('Error fetching member details:', error));
   };
@@ -218,6 +218,7 @@ const Admin = () => {
       email: email,
       photo: photo,
       title: title,
+      address: address,
     };
     fetchWithAuth(`http://localhost:8080/facultymember/${authorId}`, {
       method: 'PUT',
@@ -440,6 +441,12 @@ const Admin = () => {
             />
             <input
               type="text"
+              value={newaddress}
+              onChange={(e) => setnewAddress(e.target.value)}
+              placeholder="Enter address"
+            />
+            <input
+              type="text"
               value={newphoto}
               onChange={(e) => setnewPhoto(e.target.value)}
               placeholder="Enter photo"
@@ -481,6 +488,14 @@ const Admin = () => {
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Enter phone"
               title="Phone"
+            />
+            <p> Address</p>
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter address"
+              title="Address"
             />
             <p> Photo</p>
             <input

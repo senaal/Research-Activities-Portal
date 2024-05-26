@@ -228,20 +228,28 @@ public class FacultyMemberService {
         try {
             String formattedName = name.replace(" ", "+");
             String url = "https://api.semanticscholar.org/graph/v1/author/search";
-            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url)
-                    .queryParam("query", formattedName);
-
-            String urlWithParam = uriBuilder.toUriString();
-            ResponseEntity<String> response = restTemplate.exchange(urlWithParam, HttpMethod.GET, HttpEntity.EMPTY, String.class);
+            URI uri = UriComponentsBuilder.fromHttpUrl(url)
+                    .queryParam("query", formattedName)
+                    .build()
+                    .encode()
+                    .toUri();
+            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, HttpEntity.EMPTY, String.class);
             String responseBody = response.getBody();
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode root = objectMapper.readTree(responseBody);
-            JsonNode data = root.path("data");
-            if (data.isArray() && !data.isEmpty()) {
-                JsonNode firstResult = data.get(0);
-                Integer authorId = firstResult.path("authorId").asInt();
-                return Optional.of(authorId);
-            } else {
+            try {
+                JsonNode jsonNode = objectMapper.readTree(responseBody);
+                if (jsonNode != null) {
+                    JsonNode results = jsonNode.get("data");
+                    if (results.isArray() && !results.isEmpty()) {
+                        JsonNode firstResult = results.get(0);
+                        int authorId = firstResult.get("authorId").asInt();
+                        return Optional.of(authorId);
+                    } else {
+                        return Optional.empty();
+                    }
+                }
+            } catch (Exception e) {
+                new ResponseEntity<>("Check the Request.", HttpStatus.BAD_REQUEST);
                 return Optional.empty();
             }
 
@@ -249,10 +257,13 @@ public class FacultyMemberService {
             new ResponseEntity<>("Check the Request.", HttpStatus.BAD_REQUEST);
             return Optional.empty();
         }
+        return Optional.empty();
     }
 
 
+
     public FacultyMember createFacultyMember(CreateAuthorRequestDto createAuthorRequestDto, String token){
+        if (adminRepository.countByEmail(extractSubject(token))>0) {
             Department department = departmentRepository.findByDepartmentId(createAuthorRequestDto.getDepartmentId()).get();
             FacultyMember newMember = new FacultyMember();
             newMember.setDepartmentId(department);
@@ -262,12 +273,12 @@ public class FacultyMemberService {
             newMember.setAddress(createAuthorRequestDto.getAddress());
             newMember.setTitle(createAuthorRequestDto.getTitle());
             newMember.setPhoto(createAuthorRequestDto.getPhoto());
+            newMember.setAddress(createAuthorRequestDto.getAddress());
             Optional<String> openAlex = getOpenAlexIdApi(createAuthorRequestDto.getAuthorName());
             Optional<Integer> semantic = getSemanticScholarIdApi(createAuthorRequestDto.getAuthorName());
-            if(openAlex.isEmpty() || semantic.isEmpty()){
+            if (openAlex.isEmpty() || semantic.isEmpty()) {
                 throw new BadRequestException("There is no ID found for provided name!");
-            }
-            else{
+            } else {
                 newMember.setOpenAlexId(openAlex.get());
                 newMember.setSemanticId(semantic.get());
                 facultyMemberRepository.save(newMember);
@@ -275,6 +286,10 @@ public class FacultyMemberService {
                 facultyMemberLogsRepository.save(facultyMemberLogs);
                 return newMember;
             }
+        }
+        else{
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     public FacultyMember deleteFacultyMember(int id, String token){
