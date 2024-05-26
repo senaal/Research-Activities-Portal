@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ArticleAuthorRepository extends JpaRepository<ArticleAuthor, Integer> {
     Page<ArticleAuthor> findByAuthorId(int id,  Pageable page);
@@ -15,4 +16,9 @@ public interface ArticleAuthorRepository extends JpaRepository<ArticleAuthor, In
 
     Page<ArticleAuthor> findByIsFacultyMemberTrueAndAuthorIdIn(List<Integer> authorIds, Pageable pageable);
 
+    Set<ArticleAuthor> findByIsFacultyMemberTrueAndAuthorIdIn(List<Integer> authorIds);
+
+
+
+    Set<ArticleAuthor> findByIsFacultyMemberFalseAndScientificArticleIn(Set<ScientificArticle> scientificArticles);
 }

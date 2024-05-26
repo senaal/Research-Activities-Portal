@@ -3,7 +3,7 @@ import { CircleMarker, TileLayer, Tooltip, MapContainer, ZoomControl } from "rea
 import "leaflet/dist/leaflet.css";
 import MapEventHandler from './MapEventHandler';
 
-class BubbleMap extends Component {
+class BubbleMapDepartment extends Component {
   state = {
     countries: [],
     institutions: [],
@@ -17,22 +17,22 @@ class BubbleMap extends Component {
   };
 
   componentDidMount() {
-    fetch('http://localhost:8080/faculty/institutions-country')
+    const { id } = this.props; 
+
+    fetch(`http://localhost:8080/department/${id}/country`)
       .then(response => response.json())
       .then(data => {
         this.setCountryData(data);
       })
       .catch(error => console.error('Error fetching country data:', error));
 
-    fetch('http://localhost:8080/faculty/institutions')
+    fetch(`http://localhost:8080/department/${id}/institutions`) // Use id from props
       .then(response => response.json())
       .then(data => {
         this.setInstitutionData(data);
       })
       .catch(error => console.error('Error fetching institution data:', error));
   }
-
-
 
   setCountryData = (data) => {
     const { minLat, maxLat, minLong, maxLong } = this.state;
@@ -68,8 +68,6 @@ class BubbleMap extends Component {
     return "#2a2a78";
   };
 
-  
-
   handleZoomEnd = (zoomLevel) => {
     this.setState({ zoom: zoomLevel });
   };
@@ -104,7 +102,6 @@ class BubbleMap extends Component {
                   fillOpacity={0.5}
                   fillColor={this.getColor(institution.articleCount)}
                   stroke={false}
-
                 >
                   <Tooltip direction="right" offset={[-8, -2]} opacity={1}>
                     <span>{`${institution.institutionName}: ${institution.articleCount}`}</span>
@@ -134,4 +131,4 @@ class BubbleMap extends Component {
   }
 }
 
-export default BubbleMap;
+export default BubbleMapDepartment;

@@ -7,6 +7,8 @@ import Tabs from './Tabs';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HorizontalScroll from './HorizontalScroll';
 import PieChart from './PieChart';
+import BubbleMapDepartment from './BubbleMapDepartment'; 
+
 
 
 const Department = ({ departments }) => {
@@ -335,7 +337,7 @@ const Department = ({ departments }) => {
       </div>
 
       <Tabs
-        tabs={['Scientific Articles', 'Projects', 'Faculty Members']}
+        tabs={['Scientific Articles', 'Projects', 'Faculty Members', 'Work Counts-Institutions Map']}
         defaultTab="Scientific Articles"
         onTabChange={handleTabChange}
       />
@@ -426,6 +428,9 @@ const Department = ({ departments }) => {
               </div>
             </>
           )}
+          {activeTab === 'Work Counts-Institutions Map' && (
+              <BubbleMapDepartment id={id} /> 
+            )}
         </div>
   );
 };

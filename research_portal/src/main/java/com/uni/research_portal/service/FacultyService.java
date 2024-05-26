@@ -171,21 +171,16 @@ public class FacultyService {
 
 
     public List<CountryArticleCountDto> getTotalArticlesAndAverageCoordinatesByCountry() {
-        // Fetch all institutions
         List<Institution> institutions = institutionRepository.findAll();
 
-        // Fetch all external faculty members
         List<ExternalFacultyMember> externalFacultyMembers = externalFacultyMemberRepository.findAll();
 
-        // Fetch all article authors
         List<ArticleAuthor> articleAuthors = articleAuthorRepository.findAll();
 
-        // Create a map to count articles by authorId (only non-faculty members)
         Map<Integer, Long> articleCounts = articleAuthors.stream()
                 .filter(articleAuthor -> !articleAuthor.getIsFacultyMember())
                 .collect(Collectors.groupingBy(ArticleAuthor::getAuthorId, Collectors.counting()));
 
-        // Create a map to count articles by institutionId
         Map<Integer, Long> institutionCounts = externalFacultyMembers.stream()
                 .filter(member -> member.getInstitutionId() != null) // Filter out members with null institutionId
                 .collect(Collectors.groupingBy(
@@ -193,7 +188,6 @@ public class FacultyService {
                         Collectors.summingLong(member -> articleCounts.getOrDefault(member.getExternalAuthorId(), 0L))
                 ));
 
-        // Create a map to sum article counts, latitudes, longitudes and counts of institutions by country
         Map<String, CountryStatistics> countryStatisticsMap = new HashMap<>();
 
         // Iterate over institutions to populate the map
@@ -208,7 +202,6 @@ public class FacultyService {
             );
         }
 
-        // Convert the result to a list of CountryArticleCountDto
         return countryStatisticsMap.entrySet().stream()
                 .map(entry -> {
                     String country = entry.getKey();

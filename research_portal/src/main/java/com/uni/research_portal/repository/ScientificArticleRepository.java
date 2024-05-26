@@ -18,5 +18,6 @@ public interface ScientificArticleRepository extends JpaRepository<ScientificArt
 
     Optional<ScientificArticle> findByArticleIdAndIsRejectedFalse(int id);
     Page<ScientificArticle> findByArticleTitleContainingIgnoreCase(String title, Pageable page);
+
 }
 
