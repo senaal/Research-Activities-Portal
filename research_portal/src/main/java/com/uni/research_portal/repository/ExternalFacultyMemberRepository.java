@@ -4,6 +4,7 @@ import com.uni.research_portal.model.ExternalFacultyMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ExternalFacultyMemberRepository extends JpaRepository<ExternalFacultyMember, Integer> {
     ExternalFacultyMember findByOpenAlexId(String id);
@@ -11,5 +12,5 @@ public interface ExternalFacultyMemberRepository extends JpaRepository<ExternalF
     ExternalFacultyMember findByExternalAuthorId(int id);
     ExternalFacultyMember findBySemanticId(int id);
 
-    List<ExternalFacultyMember> findByExternalAuthorIdIn(List<Integer> externalFacultyMemberIds);
+    Set<ExternalFacultyMember> findByExternalAuthorIdIn(Set<Integer> externalFacultyMemberIds);
 }

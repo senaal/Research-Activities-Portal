@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { CircleMarker, TileLayer, Tooltip, MapContainer, Marker, ZoomControl } from "react-leaflet";
+import { CircleMarker, TileLayer, Tooltip, MapContainer, ZoomControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import MapEventHandler from './MapEventHandler';
 
@@ -94,7 +94,9 @@ class BubbleMap extends Component {
           <MapEventHandler onZoomEnd={this.handleZoomEnd} />
 
           {zoom > 3
-            ? institutions.map((institution, k) => (
+            ? institutions
+            .filter(institution => institution.x !== null && institution.y !== null && institution.institutionId !== 1)
+            .map((institution, k) => (
                 <CircleMarker
                   key={k}
                   center={[institution.x, institution.y]}
@@ -109,7 +111,9 @@ class BubbleMap extends Component {
                   </Tooltip>
                 </CircleMarker>
               ))
-            : countries.map((country, k) => (
+            : countries
+            .filter(country => country.averageLatitude !== null && country.averageLongitude !== null && country.country !== "no country")
+            .map((country, k) => (
                 <CircleMarker
                   key={k}
                   center={[country.averageLatitude, country.averageLongitude]}

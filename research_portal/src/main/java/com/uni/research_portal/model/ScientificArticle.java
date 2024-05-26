@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
+
 
 @Entity
 @Getter
@@ -45,6 +47,19 @@ public class ScientificArticle {
 
     @Column(name = "source")
     private String source;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScientificArticle that = (ScientificArticle) o;
+        return Objects.equals(articleId, that.articleId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(articleId);
+    }
 
 }
 

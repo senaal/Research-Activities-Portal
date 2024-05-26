@@ -10,7 +10,7 @@ const PieChart = ({ data }) => {
     return <div>Loading...</div>;
   }
   
-  data = data.slice(0, 10);
+  data = data.slice(0, 8);
 
   const chartData = {
     labels: data.map(item => item.name),

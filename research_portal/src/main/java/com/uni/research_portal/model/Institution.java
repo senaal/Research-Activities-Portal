@@ -16,6 +16,7 @@ public class Institution {
     @Column(name = "institution_id")
     private Integer institutionId;
 
+    @Column(name = "name", length = 1024)
     private String name;
 
     private double xCoordinate;

@@ -123,17 +123,18 @@ public class DepartmentService {
         for (FacultyMember fm: facultyMembers){
             facultyMemberIds.add(fm.getAuthorId());
         }
-        List<ArticleAuthor> articleAuthorsPage = articleAuthorRepository.findByIsFacultyMemberTrueAndAuthorIdIn(facultyMemberIds);
+        Set<ArticleAuthor> articleAuthorsPage = articleAuthorRepository.findByIsFacultyMemberTrueAndAuthorIdIn(facultyMemberIds);
         Set<ScientificArticle> scientificArticles = articleAuthorsPage.stream()
                 .map(ArticleAuthor::getScientificArticle)
                 .collect(Collectors.toSet());
 
-        List<ArticleAuthor> articleAuthors = articleAuthorRepository.findByIsFacultyMemberFalseAndScientificArticleIn(scientificArticles);
-        List<Integer> externalFacultyMemberIds = articleAuthors.stream()
-                .map(ArticleAuthor::getAuthorId)
-                .collect(Collectors.toList());
 
-        List<ExternalFacultyMember> members = externalFacultyMemberRepository.findByExternalAuthorIdIn(externalFacultyMemberIds);
+        Set<ArticleAuthor> articleAuthors = articleAuthorRepository.findByIsFacultyMemberFalseAndScientificArticleIn(scientificArticles);
+        Set<Integer> externalFacultyMemberIds = articleAuthors.stream()
+                .map(ArticleAuthor::getAuthorId)
+                .collect(Collectors.toSet());
+
+        Set<ExternalFacultyMember> members = externalFacultyMemberRepository.findByExternalAuthorIdIn(externalFacultyMemberIds);
 
         Map<Integer, Long> articleCounts = articleAuthors.stream()
                 .collect(Collectors.groupingBy(ArticleAuthor::getAuthorId, Collectors.counting()));
@@ -146,11 +147,10 @@ public class DepartmentService {
             ));
 
 
-        List<Institution> institutions = members.stream()
+        Set<Institution> institutions = members.stream()
                 .map(ExternalFacultyMember::getInstitutionId)
                 .filter(institutionId -> institutionId != null)
-                .toList();
-
+                .collect(Collectors.toSet());
 
         return institutions.stream()
                 .map(institution -> new InstitutionDto(
@@ -171,17 +171,17 @@ public class DepartmentService {
         for (FacultyMember fm: facultyMembers){
             facultyMemberIds.add(fm.getAuthorId());
         }
-        List<ArticleAuthor> articleAuthorsPage = articleAuthorRepository.findByIsFacultyMemberTrueAndAuthorIdIn(facultyMemberIds);
+        Set<ArticleAuthor> articleAuthorsPage = articleAuthorRepository.findByIsFacultyMemberTrueAndAuthorIdIn(facultyMemberIds);
         Set<ScientificArticle> scientificArticles = articleAuthorsPage.stream()
                 .map(ArticleAuthor::getScientificArticle)
                 .collect(Collectors.toSet());
 
-        List<ArticleAuthor> articleAuthors = articleAuthorRepository.findByIsFacultyMemberFalseAndScientificArticleIn(scientificArticles);
-        List<Integer> externalFacultyMemberIds = articleAuthors.stream()
+        Set<ArticleAuthor> articleAuthors = articleAuthorRepository.findByIsFacultyMemberFalseAndScientificArticleIn(scientificArticles);
+        Set<Integer> externalFacultyMemberIds = articleAuthors.stream()
                 .map(ArticleAuthor::getAuthorId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
-        List<ExternalFacultyMember> members = externalFacultyMemberRepository.findByExternalAuthorIdIn(externalFacultyMemberIds);
+        Set<ExternalFacultyMember> members = externalFacultyMemberRepository.findByExternalAuthorIdIn(externalFacultyMemberIds);
 
         Map<Integer, Long> articleCounts = articleAuthors.stream()
                 .collect(Collectors.groupingBy(ArticleAuthor::getAuthorId, Collectors.counting()));
@@ -194,10 +194,10 @@ public class DepartmentService {
                 ));
 
 
-        List<Institution> institutions = members.stream()
+        Set<Institution> institutions = members.stream()
                 .map(ExternalFacultyMember::getInstitutionId)
                 .filter(institutionId -> institutionId != null)
-                .toList();
+                .collect(Collectors.toSet());
 
         Map<String, CountryStatistics> countryStatisticsMap = new HashMap<>();
 

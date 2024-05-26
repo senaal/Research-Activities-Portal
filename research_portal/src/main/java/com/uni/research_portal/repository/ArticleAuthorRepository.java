@@ -16,9 +16,9 @@ public interface ArticleAuthorRepository extends JpaRepository<ArticleAuthor, In
 
     Page<ArticleAuthor> findByIsFacultyMemberTrueAndAuthorIdIn(List<Integer> authorIds, Pageable pageable);
 
-    List<ArticleAuthor> findByIsFacultyMemberTrueAndAuthorIdIn(List<Integer> authorIds);
+    Set<ArticleAuthor> findByIsFacultyMemberTrueAndAuthorIdIn(List<Integer> authorIds);
 
 
 
-    List<ArticleAuthor> findByIsFacultyMemberFalseAndScientificArticleIn(Set<ScientificArticle> scientificArticles);
+    Set<ArticleAuthor> findByIsFacultyMemberFalseAndScientificArticleIn(Set<ScientificArticle> scientificArticles);
 }
