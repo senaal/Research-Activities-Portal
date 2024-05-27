@@ -283,6 +283,10 @@ const Profile = () => {
     }
   };
 
+  const closeCodeModal = () => {
+    setShowCodeModal(false); // Close the pop-up when user clicks outside or on close button
+  };
+
   return (
     <div className="author" style={{ display: 'flex', flexDirection: 'row' }}>
       <div className="contact-info" style={{ marginLeft: '20px' }}>
@@ -317,23 +321,24 @@ const Profile = () => {
           </div>
         </div>
       </div>
-      <div className="send-code-button" style={{textAlign:'right', marginRight:'1%'}}>
-        <button onClick={sendVerificationCode}>Send Code</button>
-      </div>
       <div className="author-header" style={{ marginLeft: '20px', flex: 2 }}>
+      <div className="send-code-button" style={{textAlign:'right', marginRight:'1%', alignContent: 'end'}}>
+        <button onClick={sendVerificationCode}>Send Code</button>
+      </div>
       {showCodeModal && (
-        <div className="code-modal">
-          <div className="code-modal-content">
-            <h2>Enter Verification Code</h2>
-            <input
-              type="text"
-              value={verificationCode}
-              onChange={(e) => setVerificationCode(e.target.value)}
-            />
-            <button onClick={verifyCode}>Verify</button>
-          </div>
-        </div>
-      )}
+              <div className="code-modal" onClick={closeCodeModal}> {/* Close on click outside */}
+                <div className="code-modal-content" onClick={(e) => e.stopPropagation()}> {/* Prevent closing on click inside */}
+                  <span className="close" onClick={closeCodeModal}>&times;</span> {/* Close button */}
+                  <h2>Enter Verification Code</h2>
+                  <input
+                    type="text"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                  />
+                  <button onClick={verifyCode}>Verify</button>
+                </div>
+              </div>
+        )}
         <div className='charts' style={{ display: 'flex' }}>
           <div className='chart'>
             <h2>Scientific Articles</h2>

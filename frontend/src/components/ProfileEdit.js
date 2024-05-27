@@ -51,6 +51,7 @@ const ProfileEdit = () => {
         authorData.researchAreaCount = data.numberOfResearchAreas;
         setAuthor(authorData);
 
+
         // Fetch articles data for the author with pagination
         const articlesResponse = await fetch(`http://localhost:8080/article/author/${id}?page=${page}&size=${size}&sortOrder=${sortOrder}&sortBy=${sortBy}`);
         const articlesData = await articlesResponse.json();
@@ -84,7 +85,7 @@ const ProfileEdit = () => {
 
     fetchData();
     fetchResearchAreas();
-  }, [id, page, size, sortBy, sortOrder, sortByProject, sortOrderProject, pageProject]);
+  }, [id, page, size, sortBy, sortOrder, sortByProject, sortOrderProject, pageProject, email, phone]);
 
   const handleNextPage = () => {
     setPage(page + 1);
@@ -272,7 +273,7 @@ const ProfileEdit = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ email, phone }),
+        body: JSON.stringify({ email, phone, photo: author.photo, title: author.title }),
 
       });
 
@@ -300,24 +301,25 @@ const ProfileEdit = () => {
             <FontAwesomeIcon icon={faEnvelope} />{' '}
             {isEditMode ? (
               <input
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
+             
             ) : (
-              email
+              author && author.email
             )}
           </p>
           <p>
             <FontAwesomeIcon icon={faPhone} />{' '}
             {isEditMode ? (
               <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
             ) : (
-              phone
+              author && author.phone
             )}
           </p>
           {isEditMode ? (
