@@ -70,7 +70,7 @@ public class FacultyMemberController {
     }
 
     @PutMapping("/{id}")
-    public FacultyMember putMapping(@RequestBody CreateAuthorRequestDto createAuthorRequestDto, @PathVariable int id,
+    public FacultyMember editMember(@RequestBody CreateAuthorRequestDto createAuthorRequestDto, @PathVariable int id,
                                     @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
                                         
         if (validateToken(token.substring(7))) {
