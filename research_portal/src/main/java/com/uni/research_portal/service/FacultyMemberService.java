@@ -2,6 +2,7 @@ package com.uni.research_portal.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uni.research_portal.dto.*;
 import com.uni.research_portal.dto.AuthorInfoDto;
 import com.uni.research_portal.dto.CreateAuthorRequestDto;
 import com.uni.research_portal.dto.DepartmentMembers;
@@ -11,10 +12,10 @@ import com.uni.research_portal.model.Department;
 import com.uni.research_portal.model.FacultyMember;
 import com.uni.research_portal.model.FacultyMemberLogs;
 
-import com.uni.research_portal.dto.ResearchAreaDto;
 import com.uni.research_portal.model.*;
 import com.uni.research_portal.repository.*;
 import com.uni.research_portal.exception.ResourceNotFoundException;
+import com.uni.research_portal.util.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -39,6 +40,12 @@ import static com.uni.research_portal.util.Jwt.extractSubject;
 public class FacultyMemberService {
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    private VerificationService verificationService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     FacultyMemberRepository facultyMemberRepository;
@@ -307,7 +314,7 @@ public class FacultyMemberService {
     }
 
     public FacultyMember editFacultyMember(CreateAuthorRequestDto createAuthorRequestDto, int id, String token){
-        if (adminRepository.countByEmail(extractSubject(token))>0){
+        if (adminRepository.countByEmail(extractSubject(token))>0 || facultyMemberRepository.findByEmail(extractSubject(token)).getAuthorId() == id){
             FacultyMember editedMember = facultyMemberRepository.findByAuthorIdAndIsDeletedFalse(id).get();
             editedMember.setEmail(createAuthorRequestDto.getEmail());
             editedMember.setPhone(createAuthorRequestDto.getPhone());
@@ -320,7 +327,10 @@ public class FacultyMemberService {
             return editedMember;
         }
         else{
+
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+
+
         }
     }
 
@@ -382,6 +392,33 @@ public class FacultyMemberService {
         response.sort((dto1, dto2) -> Double.compare(dto2.getCount(), dto1.getCount()));
         return response;
     }
+
+    public String sendCode(int id) {
+        FacultyMember member = facultyMemberRepository.findById(id).get();
+        String email = member.getEmail();
+        String code = verificationService.generateVerificationCode(email);
+        emailService.sendVerificationCode(email, code);
+        return "checkEmail";
+    }
+
+    public VerificationResponseDto verifyCode(int id, String code) {
+        FacultyMember member = facultyMemberRepository.findById(id).get();
+        String email = member.getEmail();
+        if (verificationService.validateVerificationCode(email, code)) {
+
+            String token = Jwt.generateToken(email);
+            VerificationResponseDto response = new VerificationResponseDto(email,token);
+            return response;
+        }
+        else {
+            throw new ResourceNotFoundException("Verification code is invalid");
+        }
+    }
+
+
+
+
+
 
 
 }

@@ -19,7 +19,7 @@ public class Jwt {
         SECRET_KEY = secret_key;
     }
 
-    private static final long EXPIRATION_TIME = 864000000; // 10 day
+    private static final long EXPIRATION_TIME = 86400000; // 1 day
 
     public static String generateToken(String subject) {
         Date now = new Date();
@@ -37,10 +37,10 @@ public class Jwt {
                 .compact();
     }
 
+
     public static boolean validateToken(String token) {
         try {
             Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
-
             Date expirationDate = claims.getExpiration();
             Date now = new Date();
             if (expirationDate.after(now)) {

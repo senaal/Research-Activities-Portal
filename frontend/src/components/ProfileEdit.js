@@ -9,7 +9,7 @@ import Tabs from './Tabs';
 
 
 
-const Profile = () => {
+const ProfileEdit = () => {
   const [author, setAuthor] = useState(null);
   const [articles, setArticles] = useState([]);
   const [maxPage, setMaxPage] = useState(0);
@@ -29,6 +29,10 @@ const Profile = () => {
   const [works, setWorks] = useState([]);
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
+  const [token, setToken] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
 
 
 
@@ -248,38 +252,38 @@ const Profile = () => {
     setSortOrderProject(event.target.value);
   };
 
-  const sendVerificationCode = async () => {
-    try {
-      const response = await fetch(`http://localhost:8080/facultymember/${id}/sendCode`, {
-        method: 'POST',
-      });
-      if (response.ok) {
-        setShowCodeModal(true);
-      } else {
-        console.error('Failed to send verification code');
-      }
-    } catch (error) {
-      console.error('Error sending verification code:', error);
-    }
+  const handleEditClick = () => {
+    setIsEditMode(true);
   };
 
-  const verifyCode = async () => {
+  const handleSaveClick = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/facultymember/${id}/verify?code=${verificationCode}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+
+        const token = sessionStorage.getItem('token'); 
+        console.log(token);
+  
+        if (!token) {
+            throw new Error('No token found');
         }
+
+        const response = await fetch(`http://localhost:8080/facultymember/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email, phone }),
+
       });
-      const result = await response.json();
+
       if (response.ok) {
-        sessionStorage.setItem('token', result.token);
-        navigate(`/profile/${id}/edit`);  // Updated line
+        setIsEditMode(false);
+        // Optionally, fetch updated data from the server
       } else {
-        console.error('Failed to verify code');
+        console.error('Failed to update data');
       }
     } catch (error) {
-      console.error('Error verifying code:', error);
+      console.error('Error updating data:', error);
     }
   };
 
@@ -291,8 +295,38 @@ const Profile = () => {
         <div className='department'>{author && author.departmentId.departmentName}</div>
         <h2 style={{ marginTop: '30px' }}> {'Contact Info'}</h2>
         <div className='contact-line'>
-          <p><FontAwesomeIcon icon={faEnvelope} />  {author && author.email}</p>
-          <p><FontAwesomeIcon icon={faPhone} /> {author && author.phone} </p>
+        <div className="author-details">
+        <p>
+            <FontAwesomeIcon icon={faEnvelope} />{' '}
+            {isEditMode ? (
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            ) : (
+              email
+            )}
+          </p>
+          <p>
+            <FontAwesomeIcon icon={faPhone} />{' '}
+            {isEditMode ? (
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            ) : (
+              phone
+            )}
+          </p>
+          {isEditMode ? (
+            <button onClick={handleSaveClick}>Save</button>
+          ) : (
+            <button onClick={handleEditClick}>Edit</button>
+          )}
+        </div>
+
           <p style={{ marginTop: '60px' }}> <img src={require("./photos/index.PNG")} alt="Index " className="icon" /> <strong>h-index:</strong> {author && author.hindex}</p>
           <p><img src={require("./photos/index.PNG")} alt="Index " className="icon" /> <strong>Citation Count:</strong> {author && author.citedByCount}</p>
           <div className="number-of">
@@ -317,23 +351,7 @@ const Profile = () => {
           </div>
         </div>
       </div>
-      <div className="send-code-button" style={{textAlign:'right', marginRight:'1%'}}>
-        <button onClick={sendVerificationCode}>Send Code</button>
-      </div>
       <div className="author-header" style={{ marginLeft: '20px', flex: 2 }}>
-      {showCodeModal && (
-        <div className="code-modal">
-          <div className="code-modal-content">
-            <h2>Enter Verification Code</h2>
-            <input
-              type="text"
-              value={verificationCode}
-              onChange={(e) => setVerificationCode(e.target.value)}
-            />
-            <button onClick={verifyCode}>Verify</button>
-          </div>
-        </div>
-      )}
         <div className='charts' style={{ display: 'flex' }}>
           <div className='chart'>
             <h2>Scientific Articles</h2>
@@ -502,4 +520,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfileEdit;
