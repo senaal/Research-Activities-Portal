@@ -5,6 +5,7 @@ import com.uni.research_portal.repository.VerificationCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -14,10 +15,12 @@ public class VerificationService {
     private VerificationCodeRepository verificationCodeRepository;
 
     public String generateVerificationCode(String email) {
-        String code = UUID.randomUUID().toString();
-        VerificationCode verificationCode = new VerificationCode(code,email,LocalDateTime.now().plusMinutes(10));
+        Random random = new Random();
+        int code = 100000 + random.nextInt(900000);
+
+        VerificationCode verificationCode = new VerificationCode(String.valueOf(code), email, LocalDateTime.now().plusMinutes(10));
         verificationCodeRepository.save(verificationCode);
-        return code;
+        return String.valueOf(code);
     }
 
     public boolean validateVerificationCode(String email, String code) {

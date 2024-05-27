@@ -72,8 +72,7 @@ public class FacultyMemberController {
     @PutMapping("/{id}")
     public FacultyMember editMember(@RequestBody CreateAuthorRequestDto createAuthorRequestDto, @PathVariable int id,
                                     @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
-        System.out.println(token);
-
+                                        
         if (validateToken(token.substring(7))) {
             return facultyMemberService.editFacultyMember(createAuthorRequestDto,id, token.substring(7));
         }else{
