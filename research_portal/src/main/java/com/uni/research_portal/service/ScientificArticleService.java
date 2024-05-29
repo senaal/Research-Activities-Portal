@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.uni.research_portal.util.Jwt.extractSubject;
 
 @Service
 public class ScientificArticleService {
@@ -45,6 +48,9 @@ public class ScientificArticleService {
 
     @Autowired
     InstitutionRepository institutionRepository;
+
+    @Autowired
+    AdminRepository adminRepository;
 
 
 
@@ -453,7 +459,7 @@ public class ScientificArticleService {
     public Page<ArticleWithAuthorsDto> searchScientificArticlesByTitle(String title, String sortBy, String sortOrder, int pageNumber, int pageSize) {
         Sort.Direction direction = Sort.Direction.fromString(sortOrder);
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
-        Page<ScientificArticle> articleAuthorsPage = scientificArticleRepository.findByArticleTitleContainingIgnoreCase(title, pageable);
+        Page<ScientificArticle> articleAuthorsPage = scientificArticleRepository.findByArticleTitleContainingIgnoreCaseAndIsRejectedFalse(title, pageable);
 
         return articleAuthorsPage.map(articleDto -> {
             List<ArticleAuthor> authorIds = articleAuthorRepository.findByScientificArticle(articleDto);
@@ -478,6 +484,22 @@ public class ScientificArticleService {
                 return articleDTO;
             }).orElse(null);
         });
+    }
+
+    public void setIsRejected(int id,int memberId, String token){
+        System.out.println(extractSubject(token));
+        System.out.println(facultyMemberRepository.findByEmail(extractSubject(token)).getAuthorId());
+        if (adminRepository.countByEmail(extractSubject(token))>0 || facultyMemberRepository.findByEmail(extractSubject(token)).getAuthorId() == memberId){
+            ScientificArticle article = scientificArticleRepository.findById(id).get();
+            article.setRejected(true);
+            scientificArticleRepository.save(article);
+            scientificArticleLogsRepostory.save(new ScientificArticleLogs(article,"rejected"));
+        }
+        else{
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+
+
+        }
     }
 }
 

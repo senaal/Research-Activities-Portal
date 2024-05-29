@@ -64,6 +64,8 @@ const Profile = () => {
         setProjects(projectsData.content);
         setMaxPageProject(projectsData.totalPages);
 
+        console.log(id)
+
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -442,6 +444,7 @@ const Profile = () => {
                 </div>
                 <ul>
                   {articles.map(article => (
+                    article && article.article ? (
                     <li key={article.article.articleId}>
                       <div>
                         <a href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
@@ -449,6 +452,7 @@ const Profile = () => {
                         <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
                       </div>
                     </li>
+                    ) : null
                   ))}
                 </ul>
                 {/* Pagination controls */}
