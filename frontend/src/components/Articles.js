@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import MathRenderer from './MathRenderer';
 
 const Article = () => {
   const [articles, setArticles] = useState([]);
@@ -42,7 +43,9 @@ const Article = () => {
           {articles.map(article => (
             <li key={article.article.articleId}>
               <div>
-                <a  href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
+              <a href={article.article.paperPdf} className="article-title">
+                          <MathRenderer content={article.article.articleTitle} />
+                        </a>
                 <p className="author-info"> {article.authorNames.join(', ')}</p>
                 <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
               </div>

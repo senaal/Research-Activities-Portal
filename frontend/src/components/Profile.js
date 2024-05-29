@@ -6,6 +6,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import PieChart from './PieChart';
 import './profile.css';
 import Tabs from './Tabs';
+import MathRenderer from './MathRenderer';
 
 
 
@@ -243,7 +244,7 @@ const Profile = () => {
   const handleSortByChangeProject = (event) => {
     setSortByProject(event.target.value);
   };
-  
+
   const handleSortOrderChangeProject = (event) => {
     setSortOrderProject(event.target.value);
   };
@@ -322,22 +323,22 @@ const Profile = () => {
         </div>
       </div>
       <div className="author-header" style={{ marginLeft: '20px', flex: 2 }}>
-      <div className="send-code-button" style={{textAlign:'right', marginRight:'1%', alignContent: 'end'}}>
-        <button onClick={sendVerificationCode}>Send Code</button>
-      </div>
-      {showCodeModal && (
-              <div className="code-modal" onClick={closeCodeModal}> {/* Close on click outside */}
-                <div className="code-modal-content" onClick={(e) => e.stopPropagation()}> {/* Prevent closing on click inside */}
-                  <span className="close" onClick={closeCodeModal}>&times;</span> {/* Close button */}
-                  <h2>Enter Verification Code</h2>
-                  <input
-                    type="text"
-                    value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value)}
-                  />
-                  <button onClick={verifyCode}>Verify</button>
-                </div>
-              </div>
+        <div className="send-code-button" style={{ textAlign: 'right', marginRight: '1%', alignContent: 'end' }}>
+          <button onClick={sendVerificationCode}>Send Code</button>
+        </div>
+        {showCodeModal && (
+          <div className="code-modal" onClick={closeCodeModal}> {/* Close on click outside */}
+            <div className="code-modal-content" onClick={(e) => e.stopPropagation()}> {/* Prevent closing on click inside */}
+              <span className="close" onClick={closeCodeModal}>&times;</span> {/* Close button */}
+              <h2>Enter Verification Code</h2>
+              <input
+                type="text"
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+              />
+              <button onClick={verifyCode}>Verify</button>
+            </div>
+          </div>
         )}
         <div className='charts' style={{ display: 'flex' }}>
           <div className='chart'>
@@ -444,7 +445,9 @@ const Profile = () => {
                   {articles.map(article => (
                     <li key={article.article.articleId}>
                       <div>
-                        <a href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
+                        <a href={article.article.paperPdf} className="article-title">
+                          <MathRenderer content={article.article.articleTitle} />
+                        </a>
                         <p className="author-info"> {article.authorNames.join(', ')}</p>
                         <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
                       </div>
@@ -464,42 +467,42 @@ const Profile = () => {
               </>
             )}
             {activeTab === 'Projects' && (
-            <>
-            <div className="sort-options">
-                <select id="sortByProject" value={sortByProject} onChange={handleSortByChangeProject}>
-                  <option value="EndDate">End Date</option>
-                </select>
+              <>
+                <div className="sort-options">
+                  <select id="sortByProject" value={sortByProject} onChange={handleSortByChangeProject}>
+                    <option value="EndDate">End Date</option>
+                  </select>
 
-                <select id="sortOrder" value={sortOrderProject} onChange={handleSortOrderChangeProject}>
-                  <option value="ASC">Ascending</option>
-                  <option value="DESC">Descending</option>
-                </select>
-              </div>
-              <ul className='projects'>
-              {projects.map(project => (
-                  project && project.project ? (
-                  <li key={project.project.projectId}>
-                    <div>
-                      <a href={project.project.link} className="project-title">{project.project.projectName}</a>
-                      <p className="author-info"> {project.authorNames.join(', ')}</p>
-                      <p className="end-date">End Date: {new Date(project.project.endDate).toLocaleDateString()}</p>
-                    </div>
-                  </li>
-                  ):null
-                ))}
-              </ul>
-              {/* Pagination controls */}
-              <div className="pagination-buttons">
-                <button onClick={handlePrevPageProject} disabled={pageProject === 0} style={{ marginLeft: '35%' }}>
-                  <FontAwesomeIcon icon={faArrowLeft} />
-                </button>
-                {renderPageNumbersProject()}
-                <button onClick={handleNextPageProject} disabled={pageProject === (maxPageProject - 1)}>
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </button>
-              </div>
-            </>
-          )}
+                  <select id="sortOrder" value={sortOrderProject} onChange={handleSortOrderChangeProject}>
+                    <option value="ASC">Ascending</option>
+                    <option value="DESC">Descending</option>
+                  </select>
+                </div>
+                <ul className='projects'>
+                  {projects.map(project => (
+                    project && project.project ? (
+                      <li key={project.project.projectId}>
+                        <div>
+                          <a href={project.project.link} className="project-title">{project.project.projectName}</a>
+                          <p className="author-info"> {project.authorNames.join(', ')}</p>
+                          <p className="end-date">End Date: {new Date(project.project.endDate).toLocaleDateString()}</p>
+                        </div>
+                      </li>
+                    ) : null
+                  ))}
+                </ul>
+                {/* Pagination controls */}
+                <div className="pagination-buttons">
+                  <button onClick={handlePrevPageProject} disabled={pageProject === 0} style={{ marginLeft: '35%' }}>
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                  </button>
+                  {renderPageNumbersProject()}
+                  <button onClick={handleNextPageProject} disabled={pageProject === (maxPageProject - 1)}>
+                    <FontAwesomeIcon icon={faArrowRight} />
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

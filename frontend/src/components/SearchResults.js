@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import './searchResults.css';
+import MathRenderer from './MathRenderer';
 
 const SearchResults = () => {
   const { query } = useParams();
@@ -123,8 +124,9 @@ const SearchResults = () => {
           {searchResults.map(article => (
             <li key={article.article.articleId}>
               <div>
-                <a href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
-                <p className="author-info">{article.authorNames.join(', ')}</p>
+                <a href={article.article.paperPdf} className="article-title">
+                  <MathRenderer content={article.article.articleTitle} />
+                </a>                <p className="author-info">{article.authorNames.join(', ')}</p>
                 <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
               </div>
             </li>
