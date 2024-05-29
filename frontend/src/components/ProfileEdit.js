@@ -29,10 +29,10 @@ const ProfileEdit = () => {
   const [works, setWorks] = useState([]);
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
-  const [token, setToken] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [refresh, setRefresh] = useState(0);
 
 
 
@@ -50,7 +50,6 @@ const ProfileEdit = () => {
         authorData.projectCount = data.numberOfProjects;
         authorData.researchAreaCount = data.numberOfResearchAreas;
         setAuthor(authorData);
-
 
         // Fetch articles data for the author with pagination
         const articlesResponse = await fetch(`http://localhost:8080/article/author/${id}?page=${page}&size=${size}&sortOrder=${sortOrder}&sortBy=${sortBy}`);
@@ -85,7 +84,7 @@ const ProfileEdit = () => {
 
     fetchData();
     fetchResearchAreas();
-  }, [id, page, size, sortBy, sortOrder, sortByProject, sortOrderProject, pageProject, email, phone]);
+  }, [id, page, size, sortBy, sortOrder, sortByProject, sortOrderProject, pageProject, email, phone, refresh]);
 
   const handleNextPage = () => {
     setPage(page + 1);
@@ -288,6 +287,29 @@ const ProfileEdit = () => {
     }
   };
 
+  const handleNotMineClick = async (articleId) => {
+    try {
+      const token = sessionStorage.getItem('token'); 
+      console.log(token);
+      const response = await fetch(`http://localhost:8080/article/${id}/not-mine/${articleId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+      },
+      });
+      if (response.ok) {
+        console.log('Article marked as not mine');
+        setRefresh(refresh + 1);
+      } else {
+        console.error('Failed to mark article as not mine:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error marking article as not mine:', error);
+    }
+  };
+
+
   return (
     <div className="author" style={{ display: 'flex', flexDirection: 'row' }}>
       <div className="contact-info" style={{ marginLeft: '20px' }}>
@@ -457,13 +479,17 @@ const ProfileEdit = () => {
                 </div>
                 <ul>
                   {articles.map(article => (
+                    article && article.article ? (
                     <li key={article.article.articleId}>
                       <div>
                         <a href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
                         <p className="author-info"> {article.authorNames.join(', ')}</p>
                         <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
+                        <button onClick={() => handleNotMineClick(article.article.articleId)}>Not Mine</button>
+
                       </div>
                     </li>
+                    ) : null
                   ))}
                 </ul>
                 {/* Pagination controls */}

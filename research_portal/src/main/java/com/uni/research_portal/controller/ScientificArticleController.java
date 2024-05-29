@@ -5,8 +5,13 @@ import com.uni.research_portal.dto.ArticleWithAuthorsDto;
 import com.uni.research_portal.service.ScientificArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+
+import static com.uni.research_portal.util.Jwt.validateToken;
 
 @RestController
 @RequestMapping("article")
@@ -78,5 +83,15 @@ public class ScientificArticleController {
         int pageNum = page != null ? page : 0;
         int pageSize = size != null ? size : 10;
         return scientificArticleService.searchScientificArticlesByTitle(title, sortBy, sortOrder, pageNum, pageSize);
+    }
+
+    @PutMapping("/{memberId}/not-mine/{id}")
+    public void setIsRejected(@PathVariable int id,@PathVariable int memberId,  @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token){
+        if (validateToken(token.substring(7))) {
+            scientificArticleService.setIsRejected(id, memberId, token.substring(7));
+        }
+        else{
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
     }
 }

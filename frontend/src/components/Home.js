@@ -345,6 +345,7 @@ return (
           </div>
           <ul>
             {articles.map(article => (
+              article && article.article ? (
               <li key={article.article.articleId}>
                 <div>
                   <a href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
@@ -352,6 +353,7 @@ return (
                   <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
                 </div>
               </li>
+              ) : null
             ))}
           </ul>
           {/* Pagination controls */}
