@@ -6,27 +6,28 @@ import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HorizontalScroll from './HorizontalScroll';
 import { useParams } from 'react-router-dom';
 import PieChart from './PieChart';
+import MathRenderer from './MathRenderer';
 
 
 const Faculty = () => {
-    const [articles, setArticles] = useState([]);
-    const [maxPage, setMaxPage] = useState(0);
-    const [page, setPage] = useState(0);
-    const [size, setSize] = useState(10);
-    const [activeTab, setActiveTab] = useState('Scientific Articles'); 
-    const [members, setMembers] = useState([]);
-    const [name, setName] = useState("");
-    const [sortBy, setSortBy] = useState('publicationDate');
-    const [sortOrder, setSortOrder] = useState('DESC');
-    const [years, setYears] = useState([]);
-    const [citations, setCitations] = useState([]);
-    const [researchAreasData, setResearchAreasData] = useState([]);
-    const [projects, setProjects] = useState([]);
-    const [maxPageProject, setMaxPageProject] = useState(0);
-    const [pageProject, setPageProject] = useState(0);
-    const [sortByProject, setSortByProject] = useState('endDate');
-    const [sortOrderProject, setSortOrderProject] = useState('DESC');
-    const [works, setWorks] = useState([]);
+  const [articles, setArticles] = useState([]);
+  const [maxPage, setMaxPage] = useState(0);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+  const [activeTab, setActiveTab] = useState('Scientific Articles');
+  const [members, setMembers] = useState([]);
+  const [name, setName] = useState("");
+  const [sortBy, setSortBy] = useState('publicationDate');
+  const [sortOrder, setSortOrder] = useState('DESC');
+  const [years, setYears] = useState([]);
+  const [citations, setCitations] = useState([]);
+  const [researchAreasData, setResearchAreasData] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [maxPageProject, setMaxPageProject] = useState(0);
+  const [pageProject, setPageProject] = useState(0);
+  const [sortByProject, setSortByProject] = useState('endDate');
+  const [sortOrderProject, setSortOrderProject] = useState('DESC');
+  const [works, setWorks] = useState([]);
 
   const { id } = useParams();
 
@@ -61,13 +62,13 @@ const Faculty = () => {
         setYears(citations.years.map(year => new Date(year, 0, 1)));
         setCitations(citations.citations);
         setWorks(citations.worksCount);
-        
-     
+
+
         const projectsResponse = await fetch(`http://localhost:8080/project/faculty/${id}?page=${pageProject}&size=10&sortOrder=${sortOrderProject}&sortBy=${sortByProject}`);
         const projectsData = await projectsResponse.json();
         setProjects(projectsData.content);
         setMaxPageProject(projectsData.totalPages);
-        
+
 
 
       } catch (error) {
@@ -89,7 +90,7 @@ const Faculty = () => {
     fetchDataMembers();
     fetchResearchAreas();
 
-  }, [id,sortByProject, sortOrderProject, pageProject]); 
+  }, [id, sortByProject, sortOrderProject, pageProject]);
 
 
   const handleTabChange = (tab) => {
@@ -250,7 +251,7 @@ const Faculty = () => {
   const handleSortByChangeProject = (event) => {
     setSortByProject(event.target.value);
   };
-  
+
   const handleSortOrderChangeProject = (event) => {
     setSortOrderProject(event.target.value);
   };
@@ -367,8 +368,9 @@ const Faculty = () => {
               article && article.article ? (
                 <li key={article.article.articleId}>
                   <div>
-                    <a href={article.article.paperPdf} className="article-title">{article.article.articleTitle}</a>
-                    <p className="author-info"> {article.authorNames.join(', ')}</p>
+                    <a href={article.article.paperPdf} className="article-title">
+                      <MathRenderer content={article.article.articleTitle} />
+                    </a>                    <p className="author-info"> {article.authorNames.join(', ')}</p>
                     <p className="publication-date">Publication Date: {new Date(article.article.publicationDate).toLocaleDateString()}</p>
                   </div>
                 </li>
@@ -388,55 +390,55 @@ const Faculty = () => {
         </>
       )}
       {activeTab === 'Faculty Members' && (
-              <div>
-                {members.map(department => (
-                <div key={department.department.departmentId}>
-                  <div className='department'>
-                    <h1>{department.department.departmentName}</h1>
-                    <HorizontalScroll items={department.members} /> {}
-                  </div>  
-                </div>
-              ))}
+        <div>
+          {members.map(department => (
+            <div key={department.department.departmentId}>
+              <div className='department'>
+                <h1>{department.department.departmentName}</h1>
+                <HorizontalScroll items={department.members} /> { }
               </div>
-            )}
-            {activeTab === 'Projects' && (
-            <>
-            <div className="sort-options">
-                <select id="sortByProject" value={sortByProject} onChange={handleSortByChangeProject}>
-                  <option value="EndDate">End Date</option>
-                </select>
-
-                <select id="sortOrder" value={sortOrderProject} onChange={handleSortOrderChangeProject}>
-                  <option value="ASC">Ascending</option>
-                  <option value="DESC">Descending</option>
-                </select>
-              </div>
-              <ul className='projects'>
-                {projects.map(project => (
-                  project && project.project ? (
-                  <li key={project.project.projectId}>
-                    <div>
-                      <a href={project.project.link} className="project-title">{project.project.projectName}</a>
-                      <p className="author-info"> {project.authorNames.join(', ')}</p>
-                      <p className="end-date">End Date: {new Date(project.project.endDate).toLocaleDateString()}</p>
-                    </div>
-                  </li>
-                  ):null
-                ))}
-              </ul>
-              {/* Pagination controls */}
-              <div className="pagination-buttons">
-                <button onClick={handlePrevPageProject} disabled={pageProject === 0} style={{ marginLeft: '35%' }}>
-                  <FontAwesomeIcon icon={faArrowLeft} />
-                </button>
-                {renderPageNumbersProject()}
-                <button onClick={handleNextPageProject} disabled={pageProject === (maxPageProject - 1)}>
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </button>
-              </div>
-            </>
-          )}
+            </div>
+          ))}
         </div>
+      )}
+      {activeTab === 'Projects' && (
+        <>
+          <div className="sort-options">
+            <select id="sortByProject" value={sortByProject} onChange={handleSortByChangeProject}>
+              <option value="EndDate">End Date</option>
+            </select>
+
+            <select id="sortOrder" value={sortOrderProject} onChange={handleSortOrderChangeProject}>
+              <option value="ASC">Ascending</option>
+              <option value="DESC">Descending</option>
+            </select>
+          </div>
+          <ul className='projects'>
+            {projects.map(project => (
+              project && project.project ? (
+                <li key={project.project.projectId}>
+                  <div>
+                    <a href={project.project.link} className="project-title">{project.project.projectName}</a>
+                    <p className="author-info"> {project.authorNames.join(', ')}</p>
+                    <p className="end-date">End Date: {new Date(project.project.endDate).toLocaleDateString()}</p>
+                  </div>
+                </li>
+              ) : null
+            ))}
+          </ul>
+          {/* Pagination controls */}
+          <div className="pagination-buttons">
+            <button onClick={handlePrevPageProject} disabled={pageProject === 0} style={{ marginLeft: '35%' }}>
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
+            {renderPageNumbersProject()}
+            <button onClick={handleNextPageProject} disabled={pageProject === (maxPageProject - 1)}>
+              <FontAwesomeIcon icon={faArrowRight} />
+            </button>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 
