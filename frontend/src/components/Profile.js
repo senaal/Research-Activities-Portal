@@ -7,7 +7,7 @@ import PieChart from './PieChart';
 import './profile.css';
 import Tabs from './Tabs';
 import MathRenderer from './MathRenderer';
-
+import Modal from './Modal';
 
 
 const Profile = () => {
@@ -328,20 +328,6 @@ const Profile = () => {
         <div className="send-code-button" style={{ textAlign: 'right', marginRight: '1%', alignContent: 'end' }}>
           <button onClick={sendVerificationCode}>Send Code</button>
         </div>
-        {showCodeModal && (
-          <div className="code-modal" onClick={closeCodeModal}> {/* Close on click outside */}
-            <div className="code-modal-content" onClick={(e) => e.stopPropagation()}> {/* Prevent closing on click inside */}
-              <span className="close" onClick={closeCodeModal}>&times;</span> {/* Close button */}
-              <h2>Enter Verification Code</h2>
-              <input
-                type="text"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
-              />
-              <button onClick={verifyCode}>Verify</button>
-            </div>
-          </div>
-        )}
         <div className='charts' style={{ display: 'flex' }}>
           <div className='chart'>
             <h2>Scientific Articles</h2>
@@ -419,6 +405,20 @@ const Profile = () => {
             </ResponsiveContainer>
           </div>
         </div>
+        {showCodeModal && (
+          <div className="code-modal" onClick={closeCodeModal}> {/* Close on click outside */}
+            <div className="code-modal-content" onClick={(e) => e.stopPropagation()}> {/* Prevent closing on click inside */}
+              <span className="close" onClick={closeCodeModal}>&times;</span> {/* Close button */}
+              <h2>Enter Verification Code</h2>
+              <input
+                type="text"
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+              />
+              <button onClick={verifyCode}>Verify</button>
+            </div>
+          </div>
+        )}
         <div className="content-container" style={{ display: 'flex', flexDirection: 'row', marginTop: '20px' }}>
           <div className="main-content" style={{ flex: 1 }}>
             <div className="tabs" style={{ marginTop: '20px' }}>

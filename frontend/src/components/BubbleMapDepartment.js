@@ -76,7 +76,6 @@ class BubbleMapDepartment extends Component {
     const { countries, institutions, centerLat, centerLong, minLat, maxLat, minLong, maxLong, zoom } = this.state;
     return (
       <div>
-        <h3 style={{ textAlign: "center" }}>Work Counts With Universities</h3>
         <MapContainer
           style={{ height: "480px", width: "100%" }}
           zoom={zoom}
