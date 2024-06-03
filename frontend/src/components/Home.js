@@ -326,7 +326,7 @@ return (
       </div>
 
       <Tabs
-        tabs={['Scientific Articles', 'Projects', 'Faculty Members','Works Count-University Map']}
+        tabs={['Scientific Articles', 'Projects', 'Faculty Members','Work Count-University Map']}
         defaultTab="Scientific Articles"
         onTabChange={handleTabChange}
       />
@@ -417,7 +417,7 @@ return (
               </div>
             </>
           )}
-          {activeTab === 'Works Count-University Map' && ( 
+          {activeTab === 'Work Count-University Map' && ( 
             <BubbleMap />
           )}
         </div>
