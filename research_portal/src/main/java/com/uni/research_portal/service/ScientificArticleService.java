@@ -181,7 +181,7 @@ public class ScientificArticleService {
     }
 
 
-    public void updateArticlesWithSemantic(int id) {
+    public void updateArticlesWithSemantic(Long id) {
         try{
             String url = "https://api.semanticscholar.org/graph/v1/author/" + id + "?fields=url,name,affiliations,paperCount,externalIds,citationCount,hIndex,papers,papers.paperId,papers.isOpenAccess,papers.openAccessPdf,papers.externalIds,papers.title,papers.authors,papers.fieldsOfStudy,papers.publicationDate,papers.citationCount";
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url);
@@ -308,7 +308,7 @@ public class ScientificArticleService {
     public Page<ArticleWithAuthorsDto> getAuthorArticles(int authorId, String sortBy, String sortOrder, int pageNumber, int pageSize) {
         Sort.Direction direction = Sort.Direction.fromString(sortOrder);
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortBy));
-        Page<ArticleAuthor> articleAuthorsPage = articleAuthorRepository.findByAuthorId(authorId, pageable);
+        Page<ArticleAuthor> articleAuthorsPage = articleAuthorRepository.findByAuthorIdAndIsFacultyMemberTrue(authorId, pageable);
 
         return articleAuthorsPage.map(articleAuthor -> {
             List<ArticleAuthor> authorIds = articleAuthorRepository.findByScientificArticle(articleAuthor.getScientificArticle());
