@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface ArticleAuthorRepository extends JpaRepository<ArticleAuthor, Integer> {
-    Page<ArticleAuthor> findByAuthorId(int id,  Pageable page);
+    Page<ArticleAuthor> findByAuthorIdAndIsFacultyMemberTrue(int id,  Pageable page);
     int countByAuthorId(int id);
     List<ArticleAuthor> findByScientificArticle(ScientificArticle article);
 

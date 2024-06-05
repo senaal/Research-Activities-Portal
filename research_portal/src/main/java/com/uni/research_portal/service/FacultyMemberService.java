@@ -231,7 +231,7 @@ public class FacultyMemberService {
         }
         return Optional.empty();
     }
-    public Optional<Integer> getSemanticScholarIdApi(String name) {
+    public Optional<Long> getSemanticScholarIdApi(String name) {
         try {
             String formattedName = name.replace(" ", "+");
             String url = "https://api.semanticscholar.org/graph/v1/author/search";
@@ -249,7 +249,7 @@ public class FacultyMemberService {
                     JsonNode results = jsonNode.get("data");
                     if (results.isArray() && !results.isEmpty()) {
                         JsonNode firstResult = results.get(0);
-                        int authorId = firstResult.get("authorId").asInt();
+                        Long authorId = firstResult.get("authorId").asLong();
                         return Optional.of(authorId);
                     } else {
                         return Optional.empty();
@@ -282,7 +282,7 @@ public class FacultyMemberService {
             newMember.setPhoto(createAuthorRequestDto.getPhoto());
             newMember.setAddress(createAuthorRequestDto.getAddress());
             Optional<String> openAlex = getOpenAlexIdApi(createAuthorRequestDto.getAuthorName());
-            Optional<Integer> semantic = getSemanticScholarIdApi(createAuthorRequestDto.getAuthorName());
+            Optional<Long> semantic = getSemanticScholarIdApi(createAuthorRequestDto.getAuthorName());
             if (openAlex.isEmpty() || semantic.isEmpty()) {
                 throw new BadRequestException("There is no ID found for provided name!");
             } else {

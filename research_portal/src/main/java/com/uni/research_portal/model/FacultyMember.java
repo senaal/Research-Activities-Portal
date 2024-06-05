@@ -30,7 +30,7 @@ public class FacultyMember {
     private String openAlexId;
 
     @Column
-    private Integer semanticId;
+    private Long semanticId;
 
     @Column
     private String email;
